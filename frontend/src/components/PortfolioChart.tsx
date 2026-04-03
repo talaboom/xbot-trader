@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { createChart, ColorType, LineStyle } from 'lightweight-charts'
+import { createChart, ColorType, type Time } from 'lightweight-charts'
 
 interface Props {
   height?: number
@@ -43,7 +43,7 @@ export default function PortfolioChart({ height = 200 }: Props) {
     for (let i = 30; i >= 0; i--) {
       const time = now - i * 86400
       value += (Math.random() - 0.45) * 800
-      data.push({ time, value: Math.max(value, 95000) })
+      data.push({ time: time as Time, value: Math.max(value, 95000) })
     }
     series.setData(data)
     chart.timeScale().fitContent()

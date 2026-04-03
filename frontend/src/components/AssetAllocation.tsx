@@ -1,21 +1,43 @@
+import { useEffect, useState } from 'react'
+import { getHoldings } from '../api/dashboard'
+
 interface Asset {
   name: string
   symbol: string
   percentage: number
   color: string
-  value: string
+  value: number
 }
 
-const assets: Asset[] = [
-  { name: 'US Dollar', symbol: 'USD', percentage: 65, color: '#22c55e', value: '$65,000' },
-  { name: 'Bitcoin', symbol: 'BTC', percentage: 20, color: '#f7931a', value: '$20,000' },
-  { name: 'Ethereum', symbol: 'ETH', percentage: 10, color: '#627eea', value: '$10,000' },
-  { name: 'Solana', symbol: 'SOL', percentage: 3, color: '#9945ff', value: '$3,000' },
-  { name: 'Others', symbol: 'ALT', percentage: 2, color: '#6b7280', value: '$2,000' },
-]
-
 export default function AssetAllocation() {
-  // Calculate donut chart
+  const [assets, setAssets] = useState<Asset[]>([])
+  const [totalValue, setTotalValue] = useState(0)
+
+  useEffect(() => {
+    getHoldings()
+      .then(res => {
+        setAssets(res.data.holdings || [])
+        setTotalValue(res.data.total_value || 0)
+      })
+      .catch(() => {
+        // Fallback
+        setAssets([{ name: 'US Dollar', symbol: 'USD', percentage: 100, color: '#22c55e', value: 100000 }])
+        setTotalValue(100000)
+      })
+  }, [])
+
+  const formatValue = (v: number) => {
+    if (v >= 1000) return `$${(v / 1000).toFixed(1)}K`
+    return `$${v.toFixed(0)}`
+  }
+
+  const formatTotal = (v: number) => {
+    if (v >= 1000000) return `$${(v / 1000000).toFixed(2)}M`
+    if (v >= 1000) return `$${(v / 1000).toFixed(1)}K`
+    return `$${v.toFixed(0)}`
+  }
+
+  // Calculate donut segments
   let cumulative = 0
   const segments = assets.map(a => {
     const start = cumulative
@@ -42,7 +64,7 @@ export default function AssetAllocation() {
         </svg>
         <div className="absolute inset-0 flex items-center justify-center">
           <div className="text-center">
-            <p className="text-lg font-bold text-white">$100K</p>
+            <p className="text-lg font-bold text-white">{formatTotal(totalValue)}</p>
             <p className="text-[10px] text-gray-500">Total</p>
           </div>
         </div>
@@ -57,7 +79,7 @@ export default function AssetAllocation() {
               <span className="text-sm text-gray-300">{a.symbol}</span>
             </div>
             <div className="flex items-center gap-3">
-              <span className="text-sm text-white font-medium">{a.value}</span>
+              <span className="text-sm text-white font-medium">{formatValue(a.value)}</span>
               <span className="text-xs text-gray-500 w-8 text-right">{a.percentage}%</span>
             </div>
           </div>

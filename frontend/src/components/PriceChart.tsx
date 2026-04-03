@@ -7,16 +7,16 @@ interface Props {
 }
 
 const timeframes = [
-  { label: '1H', value: 'ONE_HOUR' },
-  { label: '4H', value: 'FOUR_HOUR' },
-  { label: '1D', value: 'ONE_DAY' },
-  { label: '1W', value: 'ONE_WEEK' },
+  { label: '1H', value: '60', seconds: 60, count: 200 },
+  { label: '4H', value: '900', seconds: 900, count: 200 },
+  { label: '1D', value: '3600', seconds: 3600, count: 200 },
+  { label: '1W', value: '86400', seconds: 86400, count: 200 },
 ]
 
 export default function PriceChart({ productId = 'BTC-USD', height = 420 }: Props) {
   const chartRef = useRef<HTMLDivElement>(null)
   const chartInstance = useRef<any>(null)
-  const [selectedTf, setSelectedTf] = useState('ONE_HOUR')
+  const [selectedTf, setSelectedTf] = useState('3600')
   const [selectedProduct, setSelectedProduct] = useState(productId)
   const [currentPrice, setCurrentPrice] = useState<number | null>(null)
   const [priceChange, setPriceChange] = useState<number>(0)
@@ -25,9 +25,12 @@ export default function PriceChart({ productId = 'BTC-USD', height = 420 }: Prop
   const products = ['BTC-USD', 'ETH-USD', 'SOL-USD', 'DOGE-USD', 'ADA-USD', 'XRP-USD', 'AVAX-USD', 'LINK-USD']
 
   useEffect(() => {
+    setSelectedProduct(productId)
+  }, [productId])
+
+  useEffect(() => {
     if (!chartRef.current) return
 
-    // Clear previous chart
     if (chartInstance.current) {
       chartInstance.current.remove()
     }
@@ -92,50 +95,55 @@ export default function PriceChart({ productId = 'BTC-USD', height = 420 }: Prop
       })
     }
 
-    // Fetch candle data
     const fetchData = async () => {
       try {
-        const resp = await fetch(`https://api.coinbase.com/v2/prices/${selectedProduct}/historic?period=day`)
-        // Fallback to generating realistic data from spot price
-        const spotResp = await fetch(`https://api.coinbase.com/v2/prices/${selectedProduct}/spot`)
-        const spotData = await spotResp.json()
-        const basePrice = parseFloat(spotData?.data?.amount || '50000')
+        const tf = timeframes.find(t => t.value === selectedTf) || timeframes[2]
+        const granularity = tf.seconds
+        const now = new Date()
+        const start = new Date(now.getTime() - granularity * tf.count * 1000)
 
-        setCurrentPrice(basePrice)
+        // Coinbase Exchange API — public, no auth required
+        // Returns: [[time, low, high, open, close, volume], ...]
+        const resp = await fetch(
+          `https://api.exchange.coinbase.com/products/${selectedProduct}/candles?granularity=${granularity}&start=${start.toISOString()}&end=${now.toISOString()}`
+        )
 
-        // Generate realistic OHLCV data
-        const now = Math.floor(Date.now() / 1000)
-        const intervalSeconds = selectedTf === 'ONE_HOUR' ? 3600 : selectedTf === 'FOUR_HOUR' ? 14400 : selectedTf === 'ONE_DAY' ? 86400 : 604800
-        const numCandles = 200
-        const data: any[] = []
-        let price = basePrice * (0.85 + Math.random() * 0.1) // Start 10-15% below current
+        if (resp.ok) {
+          const raw = await resp.json()
+          // Sort by time ascending (API returns newest first)
+          const sorted = raw.sort((a: number[], b: number[]) => a[0] - b[0])
 
-        for (let i = numCandles; i >= 0; i--) {
-          const time = now - i * intervalSeconds
-          const volatility = basePrice * 0.015
-          const trend = (basePrice - price) / numCandles * 1.5 // Trend toward current price
-          const open = price
-          const change = (Math.random() - 0.48) * volatility + trend
-          const close = open + change
-          const high = Math.max(open, close) + Math.random() * volatility * 0.5
-          const low = Math.min(open, close) - Math.random() * volatility * 0.5
-          price = close
+          const data: any[] = sorted.map((c: number[]) => {
+            const [time, low, high, open, close] = c
+            if (chartType === 'candle') {
+              return { time, open, high, low, close }
+            } else {
+              return { time, value: close }
+            }
+          })
 
-          if (chartType === 'candle') {
-            data.push({ time, open, high, low, close })
-          } else {
-            data.push({ time, value: close })
+          if (data.length > 0) {
+            series.setData(data)
+            chart.timeScale().fitContent()
+
+            // Set current price and change
+            const lastCandle = sorted[sorted.length - 1]
+            const firstCandle = sorted[0]
+            setCurrentPrice(lastCandle[4]) // close
+            if (firstCandle[4] > 0) {
+              setPriceChange(((lastCandle[4] - firstCandle[4]) / firstCandle[4]) * 100)
+            }
+            return
           }
         }
 
-        series.setData(data)
-        chart.timeScale().fitContent()
-
-        // Calculate change
-        if (data.length >= 2) {
-          const first = chartType === 'candle' ? data[0].close : data[0].value
-          const last = chartType === 'candle' ? data[data.length - 1].close : data[data.length - 1].value
-          setPriceChange(((last - first) / first) * 100)
+        // Fallback: fetch spot price if exchange API fails
+        const spotResp = await fetch(`https://api.coinbase.com/v2/prices/${selectedProduct}/spot`)
+        if (spotResp.ok) {
+          const spotData = await spotResp.json()
+          const price = parseFloat(spotData?.data?.amount || '0')
+          setCurrentPrice(price)
+          setPriceChange(0)
         }
       } catch (e) {
         console.error('Chart data error:', e)
@@ -144,7 +152,6 @@ export default function PriceChart({ productId = 'BTC-USD', height = 420 }: Prop
 
     fetchData()
 
-    // Resize handler
     const handleResize = () => {
       if (chartRef.current) {
         chart.applyOptions({ width: chartRef.current.clientWidth })
@@ -152,7 +159,6 @@ export default function PriceChart({ productId = 'BTC-USD', height = 420 }: Prop
     }
     window.addEventListener('resize', handleResize)
 
-    // Refresh data every 30 seconds
     const interval = setInterval(fetchData, 30000)
 
     return () => {
@@ -170,16 +176,13 @@ export default function PriceChart({ productId = 'BTC-USD', height = 420 }: Prop
 
   return (
     <div className="bg-[#0d0d20] border border-white/5 rounded-2xl overflow-hidden">
-      {/* Chart header */}
       <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-4">
-          {/* Product selector */}
           <select value={selectedProduct} onChange={e => setSelectedProduct(e.target.value)}
             className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm font-bold focus:outline-none focus:border-blue-500/50">
             {products.map(p => <option key={p} value={p}>{p}</option>)}
           </select>
 
-          {/* Price display */}
           {currentPrice && (
             <div>
               <span className="text-2xl font-bold text-white">{formatPrice(currentPrice)}</span>
@@ -191,17 +194,15 @@ export default function PriceChart({ productId = 'BTC-USD', height = 420 }: Prop
         </div>
 
         <div className="flex items-center gap-2">
-          {/* Chart type */}
           <div className="flex bg-white/5 rounded-lg p-0.5">
             {(['candle', 'line', 'area'] as const).map(type => (
               <button key={type} onClick={() => setChartType(type)}
                 className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${chartType === type ? 'bg-blue-500/20 text-blue-400' : 'text-gray-500 hover:text-white'}`}>
-                {type === 'candle' ? '🕯️' : type === 'line' ? '📈' : '📊'}
+                {type === 'candle' ? 'Candle' : type === 'line' ? 'Line' : 'Area'}
               </button>
             ))}
           </div>
 
-          {/* Timeframe */}
           <div className="flex bg-white/5 rounded-lg p-0.5">
             {timeframes.map(tf => (
               <button key={tf.value} onClick={() => setSelectedTf(tf.value)}
@@ -213,7 +214,6 @@ export default function PriceChart({ productId = 'BTC-USD', height = 420 }: Prop
         </div>
       </div>
 
-      {/* Chart */}
       <div ref={chartRef} />
     </div>
   )

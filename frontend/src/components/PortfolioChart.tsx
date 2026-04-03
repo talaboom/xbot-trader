@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react'
-import { createChart, ColorType, LineStyle } from 'lightweight-charts'
+import { createChart, ColorType } from 'lightweight-charts'
+import { getPortfolioHistory } from '../api/dashboard'
 
 interface Props {
   height?: number
@@ -36,17 +37,24 @@ export default function PortfolioChart({ height = 200 }: Props) {
       lineWidth: 2,
     })
 
-    // Generate portfolio value history
-    const now = Math.floor(Date.now() / 1000)
-    const data = []
-    let value = 100000
-    for (let i = 30; i >= 0; i--) {
-      const time = now - i * 86400
-      value += (Math.random() - 0.45) * 800
-      data.push({ time, value: Math.max(value, 95000) })
-    }
-    series.setData(data)
-    chart.timeScale().fitContent()
+    getPortfolioHistory()
+      .then(res => {
+        const data = res.data
+        if (data && data.length > 0) {
+          series.setData(data)
+          chart.timeScale().fitContent()
+        }
+      })
+      .catch(() => {
+        // Fallback: flat line at $100K
+        const now = Math.floor(Date.now() / 1000)
+        const data = Array.from({ length: 30 }, (_, i) => ({
+          time: now - (29 - i) * 86400,
+          value: 100000,
+        }))
+        series.setData(data)
+        chart.timeScale().fitContent()
+      })
 
     const handleResize = () => {
       if (chartRef.current) chart.applyOptions({ width: chartRef.current.clientWidth })

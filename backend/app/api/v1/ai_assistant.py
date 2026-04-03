@@ -38,9 +38,15 @@ Always end with 2-4 actionable suggestions the user can click.
 Format suggestions as a JSON array in your response like: SUGGESTIONS: ["suggestion 1", "suggestion 2"]"""
 
 
+class HistoryMessage(BaseModel):
+    role: str  # "user" or "assistant"
+    content: str
+
+
 class ChatMessage(BaseModel):
     message: str
     context: str | None = None
+    history: list[HistoryMessage] | None = None
 
 
 class PersonalityConfigRequest(BaseModel):
@@ -73,7 +79,7 @@ async def chat(msg: ChatMessage, user: User = Depends(get_current_user)):
 
     # Try Claude API first
     if ANTHROPIC_API_KEY:
-        result = await _claude_chat(message, user.username)
+        result = await _claude_chat(message, user.username, msg.history)
         if result:
             return result
 
@@ -81,8 +87,8 @@ async def chat(msg: ChatMessage, user: User = Depends(get_current_user)):
     return await _rule_based_chat(message, user)
 
 
-async def _claude_chat(message: str, username: str) -> dict | None:
-    """Send message to Claude API and parse response."""
+async def _claude_chat(message: str, username: str, history: list | None = None) -> dict | None:
+    """Send message to Claude API with conversation history."""
     try:
         # Fetch live prices for context
         btc = await get_public_price("BTC-USD")
@@ -92,6 +98,15 @@ async def _claude_chat(message: str, username: str) -> dict | None:
         price_context = ""
         if btc:
             price_context = f"\n\nCurrent prices: BTC=${btc:,.0f}, ETH=${eth:,.0f}, SOL=${sol:,.0f}"
+
+        # Build messages array with conversation history
+        messages = []
+        if history:
+            # Include up to last 10 exchanges for context (avoid token overflow)
+            for h in history[-20:]:
+                messages.append({"role": h.role, "content": h.content})
+        # Add current user message
+        messages.append({"role": "user", "content": f"User '{username}' says: {message}"})
 
         async with httpx.AsyncClient(timeout=30.0) as client:
             resp = await client.post(
@@ -105,9 +120,7 @@ async def _claude_chat(message: str, username: str) -> dict | None:
                     "model": "claude-haiku-4-5-20251001",
                     "max_tokens": 500,
                     "system": SYSTEM_PROMPT + price_context,
-                    "messages": [
-                        {"role": "user", "content": f"User '{username}' says: {message}"}
-                    ],
+                    "messages": messages,
                 },
             )
 

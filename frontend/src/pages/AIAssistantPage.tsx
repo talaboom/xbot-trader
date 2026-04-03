@@ -30,11 +30,17 @@ export default function AIAssistantPage() {
   const send = async (text: string) => {
     if (!text.trim()) return
     setInput('')
-    setMessages(prev => [...prev, { role: 'user', text }])
+    const newMessages = [...messages, { role: 'user' as const, text }]
+    setMessages(newMessages)
     setLoading(true)
 
     try {
-      const res = await client.post('/ai/chat', { message: text })
+      // Send conversation history so Claude has full context
+      const history = newMessages
+        .filter(m => m.text)
+        .map(m => ({ role: m.role, content: m.text }))
+
+      const res = await client.post('/ai/chat', { message: text, history })
       setMessages(prev => [...prev, {
         role: 'assistant',
         text: res.data.response,

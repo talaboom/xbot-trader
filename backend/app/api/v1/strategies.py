@@ -104,6 +104,10 @@ async def delete_strategy(
     if not strategy:
         raise HTTPException(status_code=404, detail="Strategy not found")
 
+    # Stop the strategy if it's running before deleting
+    if strategy.status == "running":
+        strategy.status = "stopped"
+
     await db.delete(strategy)
     await db.commit()
     return {"message": "Strategy deleted"}

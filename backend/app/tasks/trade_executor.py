@@ -5,11 +5,11 @@ Supports DCA (Dollar Cost Averaging) and Grid trading strategies.
 
 import logging
 import uuid
-from datetime import datetime, timezone
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 import httpx
-from sqlalchemy import create_engine, select, update
+from sqlalchemy import create_engine, desc, select, update
 from sqlalchemy.orm import Session, sessionmaker
 
 from app.config import settings
@@ -71,6 +71,17 @@ def _get_paper_balance(db: Session, user_id: uuid.UUID) -> Decimal:
     return PAPER_STARTING_BALANCE - spent + received - fees
 
 
+def _get_last_trade_time(db: Session, strategy_id: uuid.UUID) -> datetime | None:
+    """Get the timestamp of the most recent trade for a strategy."""
+    result = db.execute(
+        select(Trade.executed_at)
+        .where(Trade.strategy_id == strategy_id, Trade.status == "filled")
+        .order_by(desc(Trade.executed_at))
+        .limit(1)
+    ).scalar_one_or_none()
+    return result
+
+
 def _record_trade(
     db: Session,
     user_id: uuid.UUID,
@@ -126,12 +137,20 @@ def execute_strategies():
 
 
 def _execute_dca(db: Session, strategy: Strategy):
-    """Execute a DCA (Dollar Cost Averaging) buy."""
+    """Execute a DCA (Dollar Cost Averaging) buy, respecting interval_hours."""
     config = strategy.config or {}
     investment_amount = Decimal(str(config.get("investment_amount", 10)))
     max_total = Decimal(str(config.get("max_total_investment", 50000)))
     stop_loss_pct = Decimal(str(config.get("stop_loss_pct", 25)))
     take_profit_pct = Decimal(str(config.get("take_profit_pct", 40)))
+    interval_hours = float(config.get("interval_hours", 4))
+
+    # Check if enough time has passed since last trade
+    last_trade = _get_last_trade_time(db, strategy.id)
+    if last_trade:
+        next_trade_at = last_trade + timedelta(hours=interval_hours)
+        if datetime.now(timezone.utc) < next_trade_at:
+            return  # Not time yet
 
     # Check if we've hit the max investment
     if strategy.total_invested >= max_total:
@@ -188,8 +207,8 @@ def _execute_dca(db: Session, strategy: Strategy):
             _sell_all_holdings(db, strategy, price_dec, "take_profit")
 
     logger.info(
-        "DCA buy: strategy=%s, product=%s, qty=%s, price=%s",
-        strategy.id, strategy.product_id, quantity, price_dec,
+        "DCA buy: strategy=%s, product=%s, qty=%s, price=%s, next_in=%sh",
+        strategy.id, strategy.product_id, quantity, price_dec, interval_hours,
     )
 
 

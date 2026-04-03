@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getPrices, getMarketStats } from '../api/dashboard'
+import { usePriceStream } from '../hooks/usePriceStream'
 import PriceChart from '../components/PriceChart'
 
 const cryptoMeta: Record<string, { icon: string; color: string; desc: string }> = {
@@ -24,6 +25,7 @@ export default function MarketPage() {
   const [prices, setPrices] = useState<any[]>([])
   const [selected, setSelected] = useState('BTC-USD')
   const [stats, setStats] = useState<MarketStats | null>(null)
+  const streamPrices = usePriceStream()
 
   useEffect(() => {
     const load = () => {
@@ -34,6 +36,12 @@ export default function MarketPage() {
     const interval = setInterval(load, 30000)
     return () => clearInterval(interval)
   }, [])
+
+  // Overlay WebSocket live prices onto the HTTP-fetched data
+  const livePrices = prices.map(p => ({
+    ...p,
+    price: streamPrices[p.product_id] ?? p.price,
+  }))
 
   const formatPrice = (p: number) => {
     if (!p) return '$0'
@@ -59,7 +67,7 @@ export default function MarketPage() {
 
       {/* Heatmap grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {prices.map((p: any) => {
+        {livePrices.map((p: any) => {
           const meta = cryptoMeta[p.symbol] || { icon: p.symbol[0], color: '#3b82f6', desc: '' }
           const change = p.change_24h ?? 0
           const isUp = change >= 0

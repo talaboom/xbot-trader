@@ -1,0 +1,10 @@
+User-agent: *
+Allow: /
+Disallow: /dashboard
+Disallow: /settings
+Disallow: /trades
+Disallow: /assistant
+Disallow: /strategies
+Disallow: /payment
+
+Sitemap: https://www.xbottrader.shop/sitemap.xml

@@ -1,5 +1,5 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
@@ -25,6 +25,17 @@ async def create_strategy(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
+    # Free tier: max 2 strategies, paper mode only
+    if user.subscription_tier == "free":
+        count_result = await db.execute(
+            select(func.count()).select_from(Strategy).where(Strategy.user_id == user.id)
+        )
+        if count_result.scalar() >= 2:
+            raise HTTPException(status_code=403, detail="Free plan allows up to 2 strategies. Upgrade to create more.")
+
+        if not data.is_paper_mode:
+            raise HTTPException(status_code=403, detail="Live trading requires a paid plan. Upgrade to unlock.")
+
     strategy = Strategy(
         user_id=user.id,
         name=data.name,

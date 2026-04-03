@@ -13,6 +13,12 @@ class Settings(BaseSettings):
     ANTHROPIC_API_KEY: str = ""
     COINBASE_SANDBOX_URL: str = "https://api-sandbox.coinbase.com"
     COINBASE_PRODUCTION_URL: str = "https://api.coinbase.com"
+    STRIPE_SECRET_KEY: str = ""
+    STRIPE_PUBLISHABLE_KEY: str = ""
+    STRIPE_WEBHOOK_SECRET: str = ""
+    STRIPE_PRICE_TRADER: str = ""
+    STRIPE_PRICE_PRO: str = ""
+    FRONTEND_URL: str = "http://localhost:3000"
 
     class Config:
         env_file = ".env"

@@ -31,3 +31,22 @@ async def get_current_user(
         raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="User not found")
 
     return user
+
+
+TIER_LEVELS = {"free": 0, "trader": 1, "pro": 2}
+
+
+def require_tier(minimum_tier: str):
+    """Factory that returns a dependency requiring a minimum subscription tier."""
+    min_level = TIER_LEVELS.get(minimum_tier, 0)
+
+    async def _check(user: User = Depends(get_current_user)) -> User:
+        user_level = TIER_LEVELS.get(user.subscription_tier, 0)
+        if user_level < min_level:
+            raise HTTPException(
+                status_code=status.HTTP_403_FORBIDDEN,
+                detail=f"This feature requires the {minimum_tier.capitalize()} plan. Please upgrade.",
+            )
+        return user
+
+    return _check

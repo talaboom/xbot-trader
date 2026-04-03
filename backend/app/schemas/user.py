@@ -21,6 +21,8 @@ class UserResponse(BaseModel):
     username: str
     is_active: bool
     is_paper_mode: bool
+    subscription_tier: str = "free"
+    subscription_status: str = "inactive"
     created_at: datetime
 
     model_config = {"from_attributes": True}

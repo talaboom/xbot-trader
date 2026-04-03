@@ -19,6 +19,8 @@ interface MarketStats {
   total_volume_24h: number
   btc_dominance: number
   market_cap_change_24h: number
+  fear_greed_value: number
+  fear_greed_label: string
 }
 
 export default function MarketPage() {
@@ -126,9 +128,15 @@ export default function MarketPage() {
         </div>
         <div className="bg-[#0d0d20] border border-white/5 rounded-xl p-4">
           <p className="text-gray-400 text-xs mb-1">Fear & Greed</p>
-          <p className="text-xl font-bold text-yellow-400">--</p>
+          <p className={`text-xl font-bold ${
+            stats && stats.fear_greed_value >= 60 ? 'text-green-400' :
+            stats && stats.fear_greed_value >= 40 ? 'text-yellow-400' :
+            'text-red-400'
+          }`}>
+            {stats && stats.fear_greed_value ? `${stats.fear_greed_value} ${stats.fear_greed_label}` : '--'}
+          </p>
           <div className="w-full h-1.5 bg-white/10 rounded-full mt-2">
-            <div className="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 rounded-full" style={{ width: '50%' }} />
+            <div className="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 rounded-full" style={{ width: `${stats?.fear_greed_value || 50}%` }} />
           </div>
         </div>
       </div>

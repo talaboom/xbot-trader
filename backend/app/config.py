@@ -10,6 +10,7 @@ class Settings(BaseSettings):
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     ALLOWED_ORIGINS: str = "http://localhost:3000"
+    ANTHROPIC_API_KEY: str = ""
     COINBASE_SANDBOX_URL: str = "https://api-sandbox.coinbase.com"
     COINBASE_PRODUCTION_URL: str = "https://api.coinbase.com"
 

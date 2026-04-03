@@ -6,6 +6,10 @@ from app.api.v1.exchange import router as exchange_router
 from app.api.v1.strategies import router as strategies_router
 from app.api.v1.trades import router as trades_router
 from app.api.v1.ai_assistant import router as ai_router
+from app.api.v1.subscriptions import router as subscriptions_router
+from app.api.v1.notifications import router as notifications_router
+from app.api.v1.leaderboard import router as leaderboard_router
+from app.api.v1.copy_trading import router as copy_router
 
 api_router = APIRouter()
 api_router.include_router(auth_router)
@@ -14,6 +18,10 @@ api_router.include_router(dashboard_router)
 api_router.include_router(strategies_router)
 api_router.include_router(trades_router)
 api_router.include_router(ai_router)
+api_router.include_router(subscriptions_router)
+api_router.include_router(notifications_router)
+api_router.include_router(leaderboard_router)
+api_router.include_router(copy_router)
 
 
 @api_router.get("/ping")

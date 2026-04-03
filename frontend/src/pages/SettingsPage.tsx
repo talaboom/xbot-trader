@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { storeKeys, getKeys, deleteKey, verifyKeys } from '../api/exchange'
+import { getSubscriptionStatus } from '../api/subscriptions'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function SettingsPage() {
@@ -11,9 +13,13 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [verifying, setVerifying] = useState(false)
   const [message, setMessage] = useState<{ type: string; text: string } | null>(null)
+  const [sub, setSub] = useState<any>(null)
 
   const load = () => getKeys().then(r => setKeys(r.data)).catch(() => {})
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+    getSubscriptionStatus().then(setSub).catch(() => {})
+  }, [])
 
   const handleSave = async () => {
     setSaving(true)
@@ -81,6 +87,47 @@ export default function SettingsPage() {
           </div>
         </div>
       </div>
+
+      {/* Subscription */}
+      {sub && (
+        <div className="bg-[#111127] border border-white/5 rounded-2xl p-6">
+          <h2 className="text-lg font-bold text-white mb-4">Subscription</h2>
+          <div className="grid grid-cols-2 gap-4 mb-4">
+            <div>
+              <p className="text-sm text-gray-400">Plan</p>
+              <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                sub.plan === 'pro' ? 'bg-purple-500/20 text-purple-400' :
+                sub.plan === 'trader' ? 'bg-blue-500/20 text-blue-400' :
+                'bg-gray-500/20 text-gray-400'
+              }`}>
+                {sub.plan === 'free_trial' ? 'Free Trial' : sub.plan === 'trader' ? 'Trader ($20/mo)' : 'Pro ($50/mo)'}
+              </span>
+            </div>
+            <div>
+              <p className="text-sm text-gray-400">Status</p>
+              <span className={`inline-block px-3 py-1 rounded-full text-xs font-bold ${
+                sub.status === 'active' ? 'bg-green-500/20 text-green-400' : 'bg-red-500/20 text-red-400'
+              }`}>
+                {sub.status}
+              </span>
+            </div>
+            <div>
+              <p className="text-sm text-gray-400">Days Remaining</p>
+              <p className="text-white font-medium">{sub.days_remaining} days</p>
+            </div>
+            <div>
+              <p className="text-sm text-gray-400">Max Bots</p>
+              <p className="text-white font-medium">{sub.max_bots === 999 ? 'Unlimited' : sub.max_bots}</p>
+            </div>
+          </div>
+          {(sub.plan === 'free_trial' || sub.status === 'expired') && (
+            <Link to="/payment"
+              className="inline-block bg-gradient-to-r from-blue-600 to-cyan-500 px-6 py-2.5 rounded-xl font-semibold text-sm shadow-lg shadow-blue-500/25 transition hover:from-blue-500 hover:to-cyan-400">
+              Upgrade Plan
+            </Link>
+          )}
+        </div>
+      )}
 
       {/* API Keys */}
       <div className="bg-[#111127] border border-white/5 rounded-2xl p-6">

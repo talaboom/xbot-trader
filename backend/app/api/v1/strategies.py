@@ -1,8 +1,8 @@
 from fastapi import APIRouter, Depends, HTTPException
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from app.api.deps import get_current_user
+from app.api.deps import get_current_user, require_subscription
 from app.database import get_db
 from app.models.strategy import Strategy
 from app.models.user import User
@@ -23,8 +23,27 @@ async def list_strategies(user: User = Depends(get_current_user), db: AsyncSessi
 async def create_strategy(
     data: StrategyCreate,
     user: User = Depends(get_current_user),
+    plan_info: dict = Depends(require_subscription),
     db: AsyncSession = Depends(get_db),
 ):
+    # Check bot limit
+    result = await db.execute(
+        select(func.count()).where(Strategy.user_id == user.id)
+    )
+    current_count = result.scalar() or 0
+    if current_count >= plan_info["max_bots"]:
+        raise HTTPException(
+            status_code=403,
+            detail=f"Bot limit reached ({plan_info['max_bots']}). Upgrade your plan for more bots.",
+        )
+
+    # Free trial users can only use paper mode
+    if plan_info["plan"] == "free_trial" and not data.is_paper_mode:
+        raise HTTPException(
+            status_code=403,
+            detail="Live trading requires a paid subscription.",
+        )
+
     strategy = Strategy(
         user_id=user.id,
         name=data.name,
@@ -59,6 +78,7 @@ async def get_strategy(
 async def start_strategy(
     strategy_id: str,
     user: User = Depends(get_current_user),
+    plan_info: dict = Depends(require_subscription),
     db: AsyncSession = Depends(get_db),
 ):
     result = await db.execute(

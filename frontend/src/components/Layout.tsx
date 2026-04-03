@@ -1,6 +1,7 @@
 import { Link, useLocation, Outlet } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import AnimatedBackground from './AnimatedBackground'
+import NotificationBell from './NotificationBell'
 
 const variantMap: Record<string, 'default' | 'trading' | 'strategy' | 'history' | 'settings'> = {
   '/dashboard': 'trading',
@@ -86,6 +87,7 @@ export default function Layout() {
                 PAPER MODE
               </span>
             )}
+            <NotificationBell />
           </div>
         </header>
         <div className="flex-1 p-6 overflow-auto relative">

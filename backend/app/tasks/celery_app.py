@@ -1,6 +1,7 @@
 import os
 
 from celery import Celery
+from celery.schedules import crontab
 
 redis_url = os.getenv("REDIS_URL", "redis://redis:6379/0")
 
@@ -14,4 +15,14 @@ celery_app.conf.update(
     enable_utc=True,
     beat_scheduler="redbeat.RedBeatScheduler",
     redbeat_redis_url=redis_url,
+    imports=[
+        "app.tasks.strategy_tasks",
+        "app.tasks.scheduler",
+    ],
+    beat_schedule={
+        "check-strategies-every-60s": {
+            "task": "check_and_run_strategies",
+            "schedule": 60.0,  # Every 60 seconds
+        },
+    },
 )

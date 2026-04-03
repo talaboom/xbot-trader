@@ -1,3 +1,4 @@
+import os
 from logging.config import fileConfig
 
 from alembic import context
@@ -9,6 +10,13 @@ from app.models import *  # noqa: F401,F403
 config = context.config
 if config.config_file_name is not None:
     fileConfig(config.config_file_name)
+
+# Override sqlalchemy.url from environment variable if available
+db_url = os.getenv("DATABASE_URL_SYNC") or os.getenv("DATABASE_URL", "")
+if db_url:
+    # Ensure it's a sync URL (not asyncpg)
+    db_url = db_url.replace("postgresql+asyncpg://", "postgresql://")
+    config.set_main_option("sqlalchemy.url", db_url)
 
 target_metadata = Base.metadata
 

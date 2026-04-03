@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getPrices, getMarketStats } from '../api/dashboard'
+import { usePriceStream } from '../hooks/usePriceStream'
 import PriceChart from '../components/PriceChart'
 
 const cryptoMeta: Record<string, { icon: string; color: string; desc: string }> = {
@@ -18,12 +19,15 @@ interface MarketStats {
   total_volume_24h: number
   btc_dominance: number
   market_cap_change_24h: number
+  fear_greed_value: number
+  fear_greed_label: string
 }
 
 export default function MarketPage() {
   const [prices, setPrices] = useState<any[]>([])
   const [selected, setSelected] = useState('BTC-USD')
   const [stats, setStats] = useState<MarketStats | null>(null)
+  const streamPrices = usePriceStream()
 
   useEffect(() => {
     const load = () => {
@@ -34,6 +38,12 @@ export default function MarketPage() {
     const interval = setInterval(load, 30000)
     return () => clearInterval(interval)
   }, [])
+
+  // Overlay WebSocket live prices onto the HTTP-fetched data
+  const livePrices = prices.map(p => ({
+    ...p,
+    price: streamPrices[p.product_id] ?? p.price,
+  }))
 
   const formatPrice = (p: number) => {
     if (!p) return '$0'
@@ -59,7 +69,7 @@ export default function MarketPage() {
 
       {/* Heatmap grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
-        {prices.map((p: any) => {
+        {livePrices.map((p: any) => {
           const meta = cryptoMeta[p.symbol] || { icon: p.symbol[0], color: '#3b82f6', desc: '' }
           const change = p.change_24h ?? 0
           const isUp = change >= 0
@@ -118,9 +128,15 @@ export default function MarketPage() {
         </div>
         <div className="bg-[#0d0d20] border border-white/5 rounded-xl p-4">
           <p className="text-gray-400 text-xs mb-1">Fear & Greed</p>
-          <p className="text-xl font-bold text-yellow-400">--</p>
+          <p className={`text-xl font-bold ${
+            stats && stats.fear_greed_value >= 60 ? 'text-green-400' :
+            stats && stats.fear_greed_value >= 40 ? 'text-yellow-400' :
+            'text-red-400'
+          }`}>
+            {stats && stats.fear_greed_value ? `${stats.fear_greed_value} ${stats.fear_greed_label}` : '--'}
+          </p>
           <div className="w-full h-1.5 bg-white/10 rounded-full mt-2">
-            <div className="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 rounded-full" style={{ width: '50%' }} />
+            <div className="h-full bg-gradient-to-r from-red-500 via-yellow-500 to-green-500 rounded-full" style={{ width: `${stats?.fear_greed_value || 50}%` }} />
           </div>
         </div>
       </div>

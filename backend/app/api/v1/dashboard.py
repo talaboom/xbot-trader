@@ -128,30 +128,35 @@ async def get_prices():
 
 @router.get("/market-stats")
 async def get_market_stats():
-    """Fetch real global crypto market stats from CoinGecko."""
-    try:
-        async with httpx.AsyncClient(timeout=10.0) as client:
-            resp = await client.get("https://api.coingecko.com/api/v3/global")
-            if resp.status_code == 200:
-                data = resp.json().get("data", {})
-                total_mcap = data.get("total_market_cap", {}).get("usd", 0)
-                total_vol = data.get("total_volume", {}).get("usd", 0)
-                btc_dom = data.get("market_cap_percentage", {}).get("btc", 0)
-                mcap_change = data.get("market_cap_change_percentage_24h_usd", 0)
-                return {
-                    "total_market_cap": total_mcap,
-                    "total_volume_24h": total_vol,
-                    "btc_dominance": round(btc_dom, 1),
-                    "market_cap_change_24h": round(mcap_change, 1),
-                }
-    except Exception:
-        pass
-    return {
+    """Fetch real global crypto market stats from CoinGecko + Fear & Greed index."""
+    stats = {
         "total_market_cap": 0,
         "total_volume_24h": 0,
         "btc_dominance": 0,
         "market_cap_change_24h": 0,
+        "fear_greed_value": 0,
+        "fear_greed_label": "N/A",
     }
+    try:
+        async with httpx.AsyncClient(timeout=10.0) as client:
+            # CoinGecko global stats
+            resp = await client.get("https://api.coingecko.com/api/v3/global")
+            if resp.status_code == 200:
+                data = resp.json().get("data", {})
+                stats["total_market_cap"] = data.get("total_market_cap", {}).get("usd", 0)
+                stats["total_volume_24h"] = data.get("total_volume", {}).get("usd", 0)
+                stats["btc_dominance"] = round(data.get("market_cap_percentage", {}).get("btc", 0), 1)
+                stats["market_cap_change_24h"] = round(data.get("market_cap_change_percentage_24h_usd", 0), 1)
+
+            # Fear & Greed Index from alternative.me
+            fg_resp = await client.get("https://api.alternative.me/fng/?limit=1")
+            if fg_resp.status_code == 200:
+                fg_data = fg_resp.json().get("data", [{}])[0]
+                stats["fear_greed_value"] = int(fg_data.get("value", 0))
+                stats["fear_greed_label"] = fg_data.get("value_classification", "N/A")
+    except Exception:
+        pass
+    return stats
 
 
 @router.get("/products")

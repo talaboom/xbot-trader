@@ -7,6 +7,7 @@ from app.api.v1.leaderboard import router as leaderboard_router
 from app.api.v1.strategies import router as strategies_router
 from app.api.v1.trades import router as trades_router
 from app.api.v1.ai_assistant import router as ai_router
+from app.api.v1.payments import router as payments_router
 
 api_router = APIRouter()
 api_router.include_router(auth_router)
@@ -16,6 +17,7 @@ api_router.include_router(strategies_router)
 api_router.include_router(trades_router)
 api_router.include_router(ai_router)
 api_router.include_router(leaderboard_router)
+api_router.include_router(payments_router)
 
 
 @api_router.get("/ping")

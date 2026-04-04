@@ -303,10 +303,14 @@ export default function LandingPage() {
             X Bot Trader &copy; 2026
           </div>
           <div className="flex gap-6 text-gray-500 text-sm">
-            <a href="#" className="hover:text-white transition">Terms</a>
-            <a href="#" className="hover:text-white transition">Privacy</a>
-            <a href="#" className="hover:text-white transition">Support</a>
+            <Link to="/terms" className="hover:text-white transition">Terms</Link>
+            <Link to="/privacy" className="hover:text-white transition">Privacy</Link>
+            <Link to="/pricing" className="hover:text-white transition">Pricing</Link>
+            <a href="mailto:support@xbottrader.shop" className="hover:text-white transition">Support</a>
           </div>
+          <p className="text-gray-600 text-xs mt-4 md:mt-0 text-center">
+            Cryptocurrency trading involves risk. Past performance does not guarantee future results.
+          </p>
         </div>
       </footer>
 

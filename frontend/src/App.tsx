@@ -16,6 +16,8 @@ import SettingsPage from './pages/SettingsPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import MarketPage from './pages/MarketPage'
 import AIAssistantPage from './pages/AIAssistantPage'
+import TermsPage from './pages/TermsPage'
+import PrivacyPage from './pages/PrivacyPage'
 
 function App() {
   return (
@@ -29,6 +31,8 @@ function App() {
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/payment" element={<PaymentPage />} />
           <Route path="/payment/success" element={<PaymentSuccessPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/markets" element={<MarketPage />} />

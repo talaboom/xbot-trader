@@ -20,7 +20,12 @@ export default function LoginPage() {
       setTokens(res.data.access_token, res.data.refresh_token)
       navigate('/dashboard')
     } catch (err: any) {
-      setError(err.response?.data?.detail || 'Login failed')
+      const detail = err.response?.data?.detail || 'Login failed'
+      if (err.response?.status === 403 && detail.includes('not verified')) {
+        navigate(`/register?verify=${encodeURIComponent(email)}`)
+        return
+      }
+      setError(detail)
     } finally {
       setLoading(false)
     }

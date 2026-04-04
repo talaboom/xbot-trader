@@ -13,6 +13,8 @@ class Settings(BaseSettings):
     ANTHROPIC_API_KEY: str = ""
     COINBASE_SANDBOX_URL: str = "https://api-sandbox.coinbase.com"
     COINBASE_PRODUCTION_URL: str = "https://api.coinbase.com"
+    RESEND_API_KEY: str = ""
+    EMAIL_FROM: str = "X Bot Trader <noreply@xbottrader.shop>"
     STRIPE_SECRET_KEY: str = ""
     STRIPE_PUBLISHABLE_KEY: str = ""
     STRIPE_WEBHOOK_SECRET: str = ""

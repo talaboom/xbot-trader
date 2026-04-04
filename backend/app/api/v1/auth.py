@@ -57,7 +57,21 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
     await db.commit()
     await db.refresh(user)
 
-    await send_verification_email(data.email, code, data.username)
+    try:
+        await send_verification_email(data.email, code, data.username)
+    except Exception:
+        # Email sending failed — auto-verify so user isn't locked out
+        user.is_email_verified = True
+        user.email_verify_code = None
+        await db.commit()
+
+    if user.is_email_verified:
+        # Email failed, auto-verified — return tokens directly
+        token_data = {"sub": str(user.id)}
+        return TokenResponse(
+            access_token=create_access_token(token_data),
+            refresh_token=create_refresh_token(token_data),
+        )
 
     return {
         "status": "verify_email",
@@ -132,9 +146,12 @@ async def login(data: UserLogin, request: Request, db: AsyncSession = Depends(ge
             detail="Email not verified. A new verification code has been sent.",
         )
 
-    # Send login alert
-    ip = request.client.host if request.client else "unknown"
-    await send_login_alert(user.email, user.username, ip)
+    # Send login alert (non-blocking)
+    try:
+        ip = request.client.host if request.client else "unknown"
+        await send_login_alert(user.email, user.username, ip)
+    except Exception:
+        pass  # Don't block login if email fails
 
     token_data = {"sub": str(user.id)}
     return TokenResponse(

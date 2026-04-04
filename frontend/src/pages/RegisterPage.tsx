@@ -19,8 +19,14 @@ export default function RegisterPage() {
     setError('')
     setLoading(true)
     try {
-      await register(email, username, password)
-      setStep('verify')
+      const res = await register(email, username, password)
+      if (res.data.access_token) {
+        // Email service down — auto-verified, log in directly
+        setTokens(res.data.access_token, res.data.refresh_token)
+        navigate('/dashboard')
+      } else {
+        setStep('verify')
+      }
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Registration failed')
     } finally {

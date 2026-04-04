@@ -27,10 +27,22 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
     if result.scalar_one_or_none():
         raise HTTPException(status_code=400, detail="Username already taken")
 
+    # Handle referral
+    referred_by_id = None
+    if data.referral_code:
+        ref_result = await db.execute(
+            select(User).where(User.referral_code == data.referral_code.upper())
+        )
+        referrer = ref_result.scalar_one_or_none()
+        if referrer:
+            referred_by_id = referrer.id
+            referrer.referral_count = (referrer.referral_count or 0) + 1
+
     user = User(
         email=data.email,
         username=data.username,
         password_hash=hash_password(data.password),
+        referred_by=referred_by_id,
     )
     db.add(user)
     await db.commit()

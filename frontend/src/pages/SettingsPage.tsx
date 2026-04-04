@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import { storeKeys, getKeys, deleteKey, verifyKeys } from '../api/exchange'
 import { useAuth } from '../contexts/AuthContext'
+import client from '../api/client'
 
 export default function SettingsPage() {
   const { user } = useAuth()
@@ -11,9 +12,14 @@ export default function SettingsPage() {
   const [saving, setSaving] = useState(false)
   const [verifying, setVerifying] = useState(false)
   const [message, setMessage] = useState<{ type: string; text: string } | null>(null)
+  const [referral, setReferral] = useState<any>(null)
+  const [refCopied, setRefCopied] = useState(false)
 
   const load = () => getKeys().then(r => setKeys(r.data)).catch(() => {})
-  useEffect(() => { load() }, [])
+  useEffect(() => {
+    load()
+    client.get('/referrals').then(r => setReferral(r.data)).catch(() => {})
+  }, [])
 
   const handleSave = async () => {
     setSaving(true)
@@ -155,6 +161,43 @@ export default function SettingsPage() {
           </ol>
         </div>
       </div>
+
+      {/* Referral Program */}
+      {referral && (
+        <div className="bg-[#111127] border border-white/5 rounded-2xl p-6">
+          <h2 className="text-lg font-bold text-white mb-2">Refer & Earn</h2>
+          <p className="text-sm text-gray-400 mb-4">Share your link. Get 1 week free for every friend who signs up.</p>
+
+          <div className="bg-white/5 rounded-xl p-4 mb-4">
+            <div className="flex items-center justify-between mb-2">
+              <span className="text-xs text-gray-400">Your referral link</span>
+              <button onClick={() => { navigator.clipboard.writeText(referral.referral_link); setRefCopied(true); setTimeout(() => setRefCopied(false), 2000) }}
+                className={`text-xs px-3 py-1 rounded-lg transition ${refCopied ? 'bg-green-500/20 text-green-400' : 'bg-white/10 text-white hover:bg-white/20'}`}>
+                {refCopied ? 'Copied!' : 'Copy'}
+              </button>
+            </div>
+            <code className="text-sm text-blue-400 break-all">{referral.referral_link}</code>
+          </div>
+
+          <div className="grid grid-cols-2 gap-4">
+            <div className="bg-white/5 rounded-xl p-4 text-center">
+              <p className="text-3xl font-bold text-white">{referral.total_referred}</p>
+              <p className="text-xs text-gray-400 mt-1">Friends Referred</p>
+            </div>
+            <div className="bg-white/5 rounded-xl p-4 text-center">
+              <p className="text-3xl font-bold text-green-400">{referral.total_referred * 7}d</p>
+              <p className="text-xs text-gray-400 mt-1">Free Days Earned</p>
+            </div>
+          </div>
+
+          <div className="mt-4 flex gap-2">
+            <button onClick={() => { const text = `Check out X Bot Trader — AI crypto trading that works 24/7! Use my link: ${referral.referral_link}`; navigator.clipboard.writeText(text); setRefCopied(true); setTimeout(() => setRefCopied(false), 2000) }}
+              className="flex-1 bg-gradient-to-r from-blue-600 to-cyan-500 py-2.5 rounded-xl font-semibold text-sm shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition text-center">
+              Share with Friends
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

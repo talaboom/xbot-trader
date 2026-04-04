@@ -1,9 +1,11 @@
 import { useState } from 'react'
-import { useNavigate, Link } from 'react-router-dom'
+import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { register } from '../api/auth'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function RegisterPage() {
+  const [searchParams] = useSearchParams()
+  const refCode = searchParams.get('ref') || ''
   const [email, setEmail] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
@@ -17,7 +19,7 @@ export default function RegisterPage() {
     setError('')
     setLoading(true)
     try {
-      const res = await register(email, username, password)
+      const res = await register(email, username, password, refCode || undefined)
       setTokens(res.data.access_token, res.data.refresh_token)
       navigate('/dashboard')
     } catch (err: any) {
@@ -67,6 +69,12 @@ export default function RegisterPage() {
           </div>
           <p className="text-purple-400/80 text-lg">Start Trading with AI Today</p>
         </div>
+
+        {refCode && (
+          <div className="mb-4 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3 text-center">
+            <p className="text-green-400 text-sm font-medium">You were referred by a friend! Both of you get rewards.</p>
+          </div>
+        )}
 
         <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8 shadow-2xl shadow-purple-500/5">
           <h2 className="text-xl font-semibold text-white mb-6">Create Account</h2>

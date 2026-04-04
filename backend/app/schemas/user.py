@@ -8,6 +8,7 @@ class UserRegister(BaseModel):
     email: EmailStr
     username: str
     password: str
+    referral_code: str | None = None
 
 
 class UserLogin(BaseModel):
@@ -21,6 +22,8 @@ class UserResponse(BaseModel):
     username: str
     is_active: bool
     is_paper_mode: bool
+    referral_code: str | None = None
+    referral_count: int = 0
     created_at: datetime
 
     model_config = {"from_attributes": True}

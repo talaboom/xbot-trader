@@ -142,14 +142,11 @@ export default function PaymentPage() {
                   <p className="text-white font-medium text-sm">Crypto</p>
                   <p className="text-gray-500 text-xs">SOL, ETH, BTC</p>
                 </button>
-                <button onClick={() => setPayMethod('card')}
-                  className={`p-4 rounded-xl border text-center transition-all ${
-                    payMethod === 'card' ? 'border-blue-500/50 bg-blue-500/10' : 'border-white/10 hover:border-white/20'
-                  }`}>
+                <div className="p-4 rounded-xl border border-white/5 text-center opacity-40 cursor-not-allowed">
                   <span className="text-2xl block mb-1">💳</span>
                   <p className="text-white font-medium text-sm">Credit Card</p>
-                  <p className="text-gray-500 text-xs">Via Stripe</p>
-                </button>
+                  <p className="text-gray-500 text-xs">Coming Soon</p>
+                </div>
               </div>
 
               {payMethod === 'crypto' ? (

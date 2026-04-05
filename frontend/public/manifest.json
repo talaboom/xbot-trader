@@ -1,0 +1,39 @@
+{
+  "name": "X Bot Trader",
+  "short_name": "X Bot",
+  "description": "AI-powered crypto trading bots that trade 24/7 on your Coinbase account",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#0a0a1a",
+  "theme_color": "#3b82f6",
+  "orientation": "portrait",
+  "scope": "/",
+  "categories": ["finance", "business"],
+  "icons": [
+    {
+      "src": "/icons/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "/icons/icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/dashboard",
+      "description": "View your portfolio"
+    },
+    {
+      "name": "Markets",
+      "url": "/markets",
+      "description": "Live crypto prices"
+    }
+  ]
+}

@@ -6,7 +6,7 @@ export default function TermsPage() {
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link to="/" className="text-blue-400 hover:underline text-sm mb-8 block">&larr; Back to Home</Link>
         <h1 className="text-3xl font-bold text-white mb-2">Terms of Service</h1>
-        <p className="text-gray-400 mb-8">Last updated: April 3, 2026</p>
+        <p className="text-gray-400 mb-8">Last updated: April 5, 2026</p>
 
         <div className="prose prose-invert prose-sm max-w-none space-y-6 text-gray-300">
 

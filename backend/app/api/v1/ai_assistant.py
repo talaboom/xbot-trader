@@ -12,6 +12,7 @@ from app.services.coinbase_service import get_public_price
 router = APIRouter(prefix="/ai", tags=["ai"])
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
+DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 
 SYSTEM_PROMPT = """You are a Professional AI Crypto Consultant & Financial Advisor for X Bot Trader.
 
@@ -98,7 +99,12 @@ async def chat(msg: ChatMessage, user: User = Depends(get_current_user)):
     """AI assistant chat — uses Claude API if available, falls back to rule-based."""
     message = msg.message
 
-    # Try Claude API first
+    # Try AI APIs — DeepSeek first, then Claude, then fallback
+    if DEEPSEEK_API_KEY:
+        result = await _deepseek_chat(message, user.username, msg.history)
+        if result:
+            return result
+
     if ANTHROPIC_API_KEY:
         result = await _claude_chat(message, user.username, msg.history)
         if result:
@@ -106,6 +112,58 @@ async def chat(msg: ChatMessage, user: User = Depends(get_current_user)):
 
     # Fallback to rule-based responses
     return await _rule_based_chat(msg, user)
+
+
+async def _deepseek_chat(message: str, username: str, history: list | None = None) -> dict | None:
+    """Send message to DeepSeek API with conversation history."""
+    try:
+        btc = await get_public_price("BTC-USD")
+        eth = await get_public_price("ETH-USD")
+        sol = await get_public_price("SOL-USD")
+
+        price_context = ""
+        if btc:
+            price_context = f"\n\nCurrent prices: BTC=${btc:,.0f}, ETH=${eth:,.0f}, SOL=${sol:,.0f}"
+
+        messages = [{"role": "system", "content": SYSTEM_PROMPT + price_context}]
+        if history:
+            for h in history[-20:]:
+                messages.append({"role": h.role, "content": h.content})
+        messages.append({"role": "user", "content": f"User '{username}' says: {message}"})
+
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                "https://api.deepseek.com/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {DEEPSEEK_API_KEY}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": "deepseek-chat",
+                    "messages": messages,
+                    "max_tokens": 500,
+                    "temperature": 0.7,
+                },
+            )
+
+            if resp.status_code == 200:
+                data = resp.json()
+                text = data["choices"][0]["message"]["content"]
+
+                suggestions = ["What strategy should I use?", "Show current prices", "Analyze the market"]
+                if "SUGGESTIONS:" in text:
+                    parts = text.split("SUGGESTIONS:")
+                    text = parts[0].strip()
+                    try:
+                        import json
+                        suggestions = json.loads(parts[1].strip())
+                    except Exception:
+                        pass
+
+                return {"response": text, "suggestions": suggestions}
+    except Exception:
+        pass
+    return None
 
 
 async def _claude_chat(message: str, username: str, history: list | None = None) -> dict | None:

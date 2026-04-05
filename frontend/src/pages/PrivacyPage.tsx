@@ -6,12 +6,13 @@ export default function PrivacyPage() {
       <div className="max-w-3xl mx-auto px-6 py-16">
         <Link to="/" className="text-blue-400 hover:underline text-sm mb-8 block">&larr; Back to Home</Link>
         <h1 className="text-3xl font-bold text-white mb-2">Privacy Policy</h1>
-        <p className="text-gray-400 mb-8">Last updated: April 3, 2026</p>
+        <p className="text-gray-400 mb-8">Last updated: April 5, 2026</p>
 
         <div className="prose prose-invert prose-sm max-w-none space-y-6 text-gray-300">
           <section>
             <h2 className="text-xl font-bold text-white">1. Introduction</h2>
-            <p>X Bot Trader ("we", "us", "our") is committed to protecting your privacy in compliance with Canada's Personal Information Protection and Electronic Documents Act (PIPEDA). This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform at xbottrader.shop.</p>
+            <p>X Bot Trader ("we", "us", "our") is committed to protecting your privacy in compliance with Canada's Personal Information Protection and Electronic Documents Act (PIPEDA) and applicable international privacy regulations. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform at xbottrader.shop.</p>
+            <p className="mt-2">This policy applies to all users who access our website, create an account, or use our services, including those who sign in via third-party authentication providers (Google, Microsoft, Facebook).</p>
           </section>
 
           <section>
@@ -19,6 +20,15 @@ export default function PrivacyPage() {
 
             <h3 className="text-lg font-semibold text-gray-200 mt-4">Account Information</h3>
             <p>When you register, we collect your email address, username, and password. Your password is stored as a bcrypt hash — we never store or have access to your plaintext password.</p>
+
+            <h3 className="text-lg font-semibold text-gray-200 mt-4">Social Login (OAuth)</h3>
+            <p>If you sign in using Google, Microsoft, or Facebook, we receive:</p>
+            <ul className="list-disc list-inside space-y-1 ml-4">
+              <li>Your name and email address from the provider</li>
+              <li>Your profile picture URL (Google, Facebook)</li>
+              <li>A unique provider ID to link your account</li>
+            </ul>
+            <p className="mt-2">We do <strong>not</strong> receive or store your social account password. We do not post to your social accounts or access your contacts. You can disconnect social login at any time.</p>
 
             <h3 className="text-lg font-semibold text-gray-200 mt-4">Payment Information (Stripe)</h3>
             <p>Payment processing is handled entirely by <strong>Stripe, Inc.</strong> When you subscribe to a paid plan:</p>
@@ -38,6 +48,24 @@ export default function PrivacyPage() {
               <li>We only request trade-level permissions — <strong>never withdrawal permissions</strong></li>
               <li>You can delete your API keys at any time from your Settings page</li>
               <li>Decrypted keys are only held in memory during trade execution and are never logged</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold text-gray-200 mt-4">Telegram Integration</h3>
+            <p>If you connect your Telegram account:</p>
+            <ul className="list-disc list-inside space-y-1 ml-4">
+              <li>We store your Telegram chat ID to send you notifications</li>
+              <li>We do <strong>not</strong> access your Telegram messages, contacts, or profile beyond what you share via the bot</li>
+              <li>You can disconnect Telegram at any time from Settings</li>
+              <li>Notifications include trade alerts, price alerts, and bot status updates that you opt into</li>
+            </ul>
+
+            <h3 className="text-lg font-semibold text-gray-200 mt-4">AI Assistant</h3>
+            <p>When you use the AI trading assistant:</p>
+            <ul className="list-disc list-inside space-y-1 ml-4">
+              <li>Your chat messages are sent to third-party AI providers (DeepSeek or Anthropic) for processing</li>
+              <li>Messages include your username and conversation history for context</li>
+              <li>We do not store AI conversation logs beyond the current session</li>
+              <li>AI providers process your data according to their respective privacy policies</li>
             </ul>
 
             <h3 className="text-lg font-semibold text-gray-200 mt-4">Usage Data</h3>
@@ -68,6 +96,9 @@ export default function PrivacyPage() {
               <li><strong>Resend</strong> — for transactional emails (verification codes, alerts)</li>
               <li><strong>Cryptocurrency exchanges</strong> — your encrypted API keys are decrypted and sent to execute trades you have configured</li>
               <li><strong>Law enforcement</strong> — only if required by valid legal process (court order, subpoena)</li>
+              <li><strong>Google / Microsoft / Meta</strong> — if you use social login, authentication data is exchanged with these providers</li>
+              <li><strong>Telegram</strong> — if you connect Telegram, we send notification messages via Telegram's Bot API</li>
+              <li><strong>DeepSeek / Anthropic</strong> — AI assistant messages are processed by these providers</li>
               <li><strong>Railway / Vercel</strong> — our hosting providers, who process data as part of infrastructure operations</li>
             </ul>
             <p className="mt-2">Your leaderboard profile displays your username and trading performance only — no personal or financial information is exposed to other users.</p>

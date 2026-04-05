@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { register, verifyEmail, resendCode, loginWithFacebook } from '../api/auth'
 import { useAuth } from '../contexts/AuthContext'
+import OAuthButtons from '../components/OAuthButtons'
 
 declare const FB: {
   login: (cb: (res: { authResponse?: { accessToken: string }; status: string }) => void, opts: { scope: string }) => void
@@ -128,6 +129,14 @@ export default function RegisterPage() {
                   {error}
                 </div>
               )}
+              <OAuthButtons />
+
+              <div className="flex items-center gap-3 my-5">
+                <div className="flex-1 h-px bg-white/10" />
+                <span className="text-gray-500 text-xs uppercase tracking-wider">or</span>
+                <div className="flex-1 h-px bg-white/10" />
+              </div>
+
               <form onSubmit={handleRegister} className="space-y-5">
                 <div>
                   <label className="block text-gray-400 text-sm mb-2 font-medium">Email</label>
@@ -147,6 +156,16 @@ export default function RegisterPage() {
                     className="w-full bg-white/5 text-white rounded-xl px-4 py-3.5 border border-white/10 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 focus:outline-none transition-all placeholder-gray-600"
                     placeholder="Min 6 characters" required minLength={6} />
                 </div>
+                <label className="flex items-start gap-2 cursor-pointer">
+                  <input type="checkbox" required className="mt-1 w-4 h-4 rounded border-white/20 bg-white/5 text-purple-500 focus:ring-purple-500/30" />
+                  <span className="text-xs text-gray-400">
+                    I agree to the{' '}
+                    <Link to="/terms" className="text-purple-400 hover:underline">Terms of Service</Link>,{' '}
+                    <Link to="/privacy" className="text-purple-400 hover:underline">Privacy Policy</Link>, and{' '}
+                    <Link to="/risk" className="text-purple-400 hover:underline">Risk Disclaimer</Link>.
+                    I understand that cryptocurrency trading involves significant risk of loss.
+                  </span>
+                </label>
                 <button type="submit" disabled={loading}
                   className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 disabled:from-purple-800 disabled:to-pink-800 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40">
                   {loading ? 'Creating account...' : 'Create Account'}

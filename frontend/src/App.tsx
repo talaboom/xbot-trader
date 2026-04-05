@@ -21,6 +21,7 @@ const AIAssistantPage    = lazy(() => import('./pages/AIAssistantPage'))
 const TermsPage          = lazy(() => import('./pages/TermsPage'))
 const PrivacyPage        = lazy(() => import('./pages/PrivacyPage'))
 const RiskPage           = lazy(() => import('./pages/RiskPage'))
+const OAuthCallbackPage  = lazy(() => import('./pages/OAuthCallbackPage'))
 
 function PageLoader() {
   return (
@@ -46,6 +47,7 @@ function App() {
               <Route path="/terms"          element={<TermsPage />} />
               <Route path="/privacy"        element={<PrivacyPage />} />
               <Route path="/risk"           element={<RiskPage />} />
+              <Route path="/auth/callback"  element={<OAuthCallbackPage />} />
               <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
                 <Route path="/dashboard"   element={<DashboardPage />} />
                 <Route path="/markets"     element={<MarketPage />} />

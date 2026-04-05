@@ -16,11 +16,14 @@ export default function SettingsPage() {
   const [message, setMessage] = useState<{ type: string; text: string } | null>(null)
   const [referral, setReferral] = useState<any>(null)
   const [refCopied, setRefCopied] = useState(false)
+  const [telegramStatus, setTelegramStatus] = useState<any>(null)
+  const [telegramLoading, setTelegramLoading] = useState(false)
 
   const load = () => getKeys().then(r => setKeys(r.data)).catch(() => {})
   useEffect(() => {
     load()
     client.get('/referrals').then(r => setReferral(r.data)).catch(() => {})
+    client.get('/telegram/status').then(r => setTelegramStatus(r.data)).catch(() => {})
   }, [])
 
   const handleSave = async () => {
@@ -199,6 +202,104 @@ export default function SettingsPage() {
             <li>Copy both the API Key ID and Private Key here</li>
           </ol>
         </div>
+      </div>
+
+      {/* Telegram Integration */}
+      <div className="bg-[#111127] border border-white/5 rounded-2xl p-6">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-xl bg-[#229ED9]/20 flex items-center justify-center">
+            <svg className="w-6 h-6 text-[#229ED9]" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+            </svg>
+          </div>
+          <div>
+            <h2 className="text-lg font-bold text-white">Telegram</h2>
+            <p className="text-sm text-gray-400">Get trade alerts and updates on Telegram</p>
+          </div>
+        </div>
+
+        {telegramStatus?.connected ? (
+          <div className="space-y-3">
+            <div className="flex items-center gap-2 bg-green-500/10 border border-green-500/20 rounded-xl px-4 py-3">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              <span className="text-green-400 text-sm font-medium">Telegram Connected</span>
+            </div>
+            <p className="text-xs text-gray-400">You'll receive trade alerts, price notifications, and bot status updates.</p>
+            <button
+              onClick={async () => {
+                await client.delete('/telegram/disconnect')
+                setTelegramStatus({ connected: false, channel_url: telegramStatus.channel_url })
+              }}
+              className="text-xs px-3 py-1.5 rounded-lg border border-red-500/30 text-red-400 hover:bg-red-500/10 transition"
+            >
+              Disconnect
+            </button>
+          </div>
+        ) : (
+          <div className="space-y-3">
+            <p className="text-sm text-gray-400">Connect your Telegram to receive real-time notifications:</p>
+            <ul className="text-sm text-gray-400 space-y-1">
+              <li className="flex items-center gap-2"><span className="text-green-400">&#10003;</span> Trade execution alerts</li>
+              <li className="flex items-center gap-2"><span className="text-green-400">&#10003;</span> Price movement notifications</li>
+              <li className="flex items-center gap-2"><span className="text-green-400">&#10003;</span> Bot status updates</li>
+              <li className="flex items-center gap-2"><span className="text-green-400">&#10003;</span> Daily P&L summaries</li>
+            </ul>
+            <button
+              disabled={telegramLoading}
+              onClick={async () => {
+                setTelegramLoading(true)
+                try {
+                  const res = await client.post('/telegram/generate-link-code')
+                  const code = res.data.code
+                  // Get bot info
+                  const botRes = await client.get('/telegram/bot-info')
+                  const botUsername = botRes.data.bot_username
+                  if (botUsername) {
+                    window.open(`https://t.me/${botUsername}?start=${code}`, '_blank')
+                    // Poll for connection
+                    const poll = setInterval(async () => {
+                      const status = await client.get('/telegram/status')
+                      if (status.data.connected) {
+                        clearInterval(poll)
+                        setTelegramStatus(status.data)
+                      }
+                    }, 3000)
+                    setTimeout(() => clearInterval(poll), 60000)
+                  } else {
+                    setMessage({ type: 'error', text: 'Telegram bot not configured yet' })
+                  }
+                } catch {
+                  setMessage({ type: 'error', text: 'Failed to generate Telegram link' })
+                } finally {
+                  setTelegramLoading(false)
+                }
+              }}
+              className="w-full bg-[#229ED9] hover:bg-[#1E8DC5] disabled:bg-gray-700 text-white font-semibold py-3 rounded-xl transition flex items-center justify-center gap-2"
+            >
+              <svg className="w-5 h-5" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+              </svg>
+              {telegramLoading ? 'Opening Telegram...' : 'Connect Telegram'}
+            </button>
+          </div>
+        )}
+
+        {/* Channel link */}
+        {telegramStatus?.channel_url && (
+          <div className="mt-4 pt-4 border-t border-white/5">
+            <a
+              href={telegramStatus.channel_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="flex items-center gap-2 text-sm text-[#229ED9] hover:text-[#1E8DC5] transition"
+            >
+              <svg className="w-4 h-4" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M11.944 0A12 12 0 0 0 0 12a12 12 0 0 0 12 12 12 12 0 0 0 12-12A12 12 0 0 0 12 0a12 12 0 0 0-.056 0zm4.962 7.224c.1-.002.321.023.465.14a.506.506 0 0 1 .171.325c.016.093.036.306.02.472-.18 1.898-.962 6.502-1.36 8.627-.168.9-.499 1.201-.82 1.23-.696.065-1.225-.46-1.9-.902-1.056-.693-1.653-1.124-2.678-1.8-1.185-.78-.417-1.21.258-1.91.177-.184 3.247-2.977 3.307-3.23.007-.032.014-.15-.056-.212s-.174-.041-.249-.024c-.106.024-1.793 1.14-5.061 3.345-.48.33-.913.49-1.302.48-.428-.008-1.252-.241-1.865-.44-.752-.245-1.349-.374-1.297-.789.027-.216.325-.437.893-.663 3.498-1.524 5.83-2.529 6.998-3.014 3.332-1.386 4.025-1.627 4.476-1.635z"/>
+              </svg>
+              Join our Telegram Channel
+            </a>
+          </div>
+        )}
       </div>
 
       {/* Referral Program */}

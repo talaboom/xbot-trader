@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { login, loginWithFacebook } from '../api/auth'
 import { useAuth } from '../contexts/AuthContext'
+import OAuthButtons from '../components/OAuthButtons'
 
 declare const FB: {
   login: (cb: (res: { authResponse?: { accessToken: string }; status: string }) => void, opts: { scope: string }) => void
@@ -113,6 +114,14 @@ export default function LoginPage() {
               {error}
             </div>
           )}
+          <OAuthButtons />
+
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-gray-500 text-xs uppercase tracking-wider">or</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-gray-400 text-sm mb-2 font-medium">Email</label>
@@ -148,6 +157,12 @@ export default function LoginPage() {
                 </span>
               ) : 'Sign In'}
             </button>
+            <p className="text-center text-xs text-gray-500 mt-3">
+              By signing in, you agree to our{' '}
+              <Link to="/terms" className="text-blue-400 hover:underline">Terms of Service</Link>
+              {' '}and{' '}
+              <Link to="/privacy" className="text-blue-400 hover:underline">Privacy Policy</Link>
+            </p>
           </form>
           <div className="mt-6">
             <div className="flex items-center gap-3 mb-4">

@@ -8,6 +8,7 @@ import LoginPage from './pages/LoginPage'
 import RegisterPage from './pages/RegisterPage'
 import PricingPage from './pages/PricingPage'
 import PaymentPage from './pages/PaymentPage'
+import PaymentSuccessPage from './pages/PaymentSuccessPage'
 import DashboardPage from './pages/DashboardPage'
 import StrategiesPage from './pages/StrategiesPage'
 import TradeHistoryPage from './pages/TradeHistoryPage'
@@ -15,6 +16,9 @@ import SettingsPage from './pages/SettingsPage'
 import LeaderboardPage from './pages/LeaderboardPage'
 import MarketPage from './pages/MarketPage'
 import AIAssistantPage from './pages/AIAssistantPage'
+import TermsPage from './pages/TermsPage'
+import PrivacyPage from './pages/PrivacyPage'
+import RiskPage from './pages/RiskPage'
 
 function App() {
   return (
@@ -27,6 +31,10 @@ function App() {
           <Route path="/register" element={<RegisterPage />} />
           <Route path="/pricing" element={<PricingPage />} />
           <Route path="/payment" element={<PaymentPage />} />
+          <Route path="/payment/success" element={<PaymentSuccessPage />} />
+          <Route path="/terms" element={<TermsPage />} />
+          <Route path="/privacy" element={<PrivacyPage />} />
+          <Route path="/risk" element={<RiskPage />} />
           <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
             <Route path="/dashboard" element={<DashboardPage />} />
             <Route path="/markets" element={<MarketPage />} />

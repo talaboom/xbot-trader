@@ -4,6 +4,7 @@ from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 
 from app.api.v1.router import api_router
+from app.api.v1.stripe_webhook import router as webhook_router
 from app.api.v1.websocket import router as ws_router
 from app.config import settings
 
@@ -21,6 +22,7 @@ app.add_middleware(
 )
 
 app.include_router(api_router, prefix="/api/v1")
+app.include_router(webhook_router)
 app.include_router(ws_router)
 
 

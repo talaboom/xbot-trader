@@ -1,5 +1,7 @@
 import { useState, useEffect } from 'react'
+import { Link } from 'react-router-dom'
 import { storeKeys, getKeys, deleteKey, verifyKeys } from '../api/exchange'
+import { createPortalSession } from '../api/payments'
 import { useAuth } from '../contexts/AuthContext'
 import client from '../api/client'
 
@@ -85,6 +87,43 @@ export default function SettingsPage() {
               {user?.is_paper_mode ? 'Paper Trading' : 'Live Trading'}
             </span>
           </div>
+        </div>
+      </div>
+
+      {/* Subscription */}
+      <div className="bg-[#111127] border border-white/5 rounded-2xl p-6">
+        <h2 className="text-lg font-bold text-white mb-4">Subscription</h2>
+        <div className="flex items-center justify-between">
+          <div>
+            <p className="text-white font-medium capitalize">{user?.subscription_tier || 'free'} Plan</p>
+            <p className="text-sm text-gray-400">
+              {user?.subscription_status === 'active'
+                ? 'Active subscription'
+                : user?.subscription_status === 'past_due'
+                ? 'Payment past due'
+                : 'No active subscription'}
+            </p>
+          </div>
+          {user?.subscription_status === 'active' ? (
+            <button
+              onClick={async () => {
+                try {
+                  const res = await createPortalSession()
+                  window.location.href = res.data.portal_url
+                } catch {}
+              }}
+              className="px-4 py-2 rounded-xl border border-white/10 text-white text-sm hover:bg-white/5 transition"
+            >
+              Manage Subscription
+            </button>
+          ) : (
+            <Link
+              to="/pricing"
+              className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-sm font-semibold shadow-lg shadow-blue-500/25"
+            >
+              Upgrade
+            </Link>
+          )}
         </div>
       </div>
 

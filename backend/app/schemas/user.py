@@ -24,6 +24,8 @@ class UserResponse(BaseModel):
     is_paper_mode: bool
     referral_code: str | None = None
     referral_count: int = 0
+    subscription_tier: str = "free"
+    subscription_status: str = "inactive"
     created_at: datetime
 
     model_config = {"from_attributes": True}

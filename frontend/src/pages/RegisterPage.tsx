@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
-import { register } from '../api/auth'
+import { register, verifyEmail, resendCode } from '../api/auth'
 import { useAuth } from '../contexts/AuthContext'
 
 export default function RegisterPage() {
@@ -9,19 +9,26 @@ export default function RegisterPage() {
   const [email, setEmail] = useState('')
   const [username, setUsername] = useState('')
   const [password, setPassword] = useState('')
+  const [code, setCode] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [step, setStep] = useState<'register' | 'verify'>('register')
   const { setTokens } = useAuth()
   const navigate = useNavigate()
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
     setError('')
     setLoading(true)
     try {
       const res = await register(email, username, password, refCode || undefined)
-      setTokens(res.data.access_token, res.data.refresh_token)
-      navigate('/dashboard')
+      if (res.data.access_token) {
+        // Email service down — auto-verified, log in directly
+        setTokens(res.data.access_token, res.data.refresh_token)
+        navigate('/dashboard')
+      } else {
+        setStep('verify')
+      }
     } catch (err: any) {
       setError(err.response?.data?.detail || 'Registration failed')
     } finally {
@@ -29,9 +36,33 @@ export default function RegisterPage() {
     }
   }
 
+  const handleVerify = async (e: React.FormEvent) => {
+    e.preventDefault()
+    setError('')
+    setLoading(true)
+    try {
+      const res = await verifyEmail(email, code)
+      setTokens(res.data.access_token, res.data.refresh_token)
+      navigate('/dashboard')
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Verification failed')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const handleResend = async () => {
+    setError('')
+    try {
+      await resendCode(email)
+      setError('')
+    } catch (err: any) {
+      setError(err.response?.data?.detail || 'Failed to resend code')
+    }
+  }
+
   return (
     <div className="min-h-screen relative overflow-hidden flex items-center justify-center px-4">
-      {/* Animated gradient background */}
       <div className="absolute inset-0 bg-[#0a0a1a]">
         <div className="absolute top-[-20%] right-[-10%] w-[600px] h-[600px] rounded-full bg-purple-600/20 blur-[120px] animate-pulse" />
         <div className="absolute bottom-[-20%] left-[-10%] w-[500px] h-[500px] rounded-full bg-blue-600/20 blur-[120px] animate-pulse" style={{ animationDelay: '1s' }} />
@@ -41,18 +72,6 @@ export default function RegisterPage() {
           backgroundImage: 'linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)',
           backgroundSize: '50px 50px'
         }} />
-        {[...Array(20)].map((_, i) => (
-          <div
-            key={i}
-            className="absolute w-1 h-1 rounded-full bg-purple-400/40"
-            style={{
-              top: `${Math.random() * 100}%`,
-              left: `${Math.random() * 100}%`,
-              animation: `float ${5 + Math.random() * 10}s ease-in-out infinite`,
-              animationDelay: `${Math.random() * 5}s`,
-            }}
-          />
-        ))}
       </div>
 
       <div className="w-full max-w-md relative z-10">
@@ -77,93 +96,90 @@ export default function RegisterPage() {
         )}
 
         <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8 shadow-2xl shadow-purple-500/5">
-          <h2 className="text-xl font-semibold text-white mb-6">Create Account</h2>
-          {error && (
-            <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm mb-5">
-              {error}
-            </div>
+          {step === 'register' ? (
+            <>
+              <h2 className="text-xl font-semibold text-white mb-6">Create Account</h2>
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm mb-5">
+                  {error}
+                </div>
+              )}
+              <form onSubmit={handleRegister} className="space-y-5">
+                <div>
+                  <label className="block text-gray-400 text-sm mb-2 font-medium">Email</label>
+                  <input type="email" value={email} onChange={(e) => setEmail(e.target.value)}
+                    className="w-full bg-white/5 text-white rounded-xl px-4 py-3.5 border border-white/10 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 focus:outline-none transition-all placeholder-gray-600"
+                    placeholder="trader@example.com" required />
+                </div>
+                <div>
+                  <label className="block text-gray-400 text-sm mb-2 font-medium">Username</label>
+                  <input type="text" value={username} onChange={(e) => setUsername(e.target.value)}
+                    className="w-full bg-white/5 text-white rounded-xl px-4 py-3.5 border border-white/10 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 focus:outline-none transition-all placeholder-gray-600"
+                    placeholder="Choose a username" required />
+                </div>
+                <div>
+                  <label className="block text-gray-400 text-sm mb-2 font-medium">Password</label>
+                  <input type="password" value={password} onChange={(e) => setPassword(e.target.value)}
+                    className="w-full bg-white/5 text-white rounded-xl px-4 py-3.5 border border-white/10 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 focus:outline-none transition-all placeholder-gray-600"
+                    placeholder="Min 6 characters" required minLength={6} />
+                </div>
+                <button type="submit" disabled={loading}
+                  className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 disabled:from-purple-800 disabled:to-pink-800 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40">
+                  {loading ? 'Creating account...' : 'Create Account'}
+                </button>
+              </form>
+            </>
+          ) : (
+            <>
+              <h2 className="text-xl font-semibold text-white mb-2">Verify Your Email</h2>
+              <p className="text-gray-400 text-sm mb-6">We sent a 6-digit code to <span className="text-white">{email}</span></p>
+              {error && (
+                <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm mb-5">
+                  {error}
+                </div>
+              )}
+              <form onSubmit={handleVerify} className="space-y-5">
+                <div>
+                  <label className="block text-gray-400 text-sm mb-2 font-medium">Verification Code</label>
+                  <input type="text" value={code} onChange={(e) => setCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                    className="w-full bg-white/5 text-white rounded-xl px-4 py-4 border border-white/10 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 focus:outline-none transition-all text-center text-2xl tracking-[0.5em] font-mono placeholder-gray-600"
+                    placeholder="000000" required maxLength={6} autoFocus />
+                </div>
+                <button type="submit" disabled={loading || code.length !== 6}
+                  className="w-full bg-gradient-to-r from-green-600 to-emerald-500 hover:from-green-500 hover:to-emerald-400 disabled:from-gray-700 disabled:to-gray-700 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-green-500/25">
+                  {loading ? 'Verifying...' : 'Verify Email'}
+                </button>
+              </form>
+              <div className="mt-4 text-center">
+                <button onClick={handleResend} className="text-purple-400 hover:text-purple-300 text-sm transition">
+                  Didn't receive the code? Resend
+                </button>
+              </div>
+            </>
           )}
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-gray-400 text-sm mb-2 font-medium">Email</label>
-              <input
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                className="w-full bg-white/5 text-white rounded-xl px-4 py-3.5 border border-white/10 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 focus:outline-none transition-all placeholder-gray-600"
-                placeholder="trader@example.com"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-gray-400 text-sm mb-2 font-medium">Username</label>
-              <input
-                type="text"
-                value={username}
-                onChange={(e) => setUsername(e.target.value)}
-                className="w-full bg-white/5 text-white rounded-xl px-4 py-3.5 border border-white/10 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 focus:outline-none transition-all placeholder-gray-600"
-                placeholder="Choose a username"
-                required
-              />
-            </div>
-            <div>
-              <label className="block text-gray-400 text-sm mb-2 font-medium">Password</label>
-              <input
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                className="w-full bg-white/5 text-white rounded-xl px-4 py-3.5 border border-white/10 focus:border-purple-500/50 focus:ring-2 focus:ring-purple-500/20 focus:outline-none transition-all placeholder-gray-600"
-                placeholder="Min 6 characters"
-                required
-                minLength={6}
-              />
-            </div>
-            <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 disabled:from-purple-800 disabled:to-pink-800 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40"
-            >
-              {loading ? (
-                <span className="flex items-center justify-center gap-2">
-                  <svg className="animate-spin h-5 w-5" viewBox="0 0 24 24"><circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" fill="none" /><path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" /></svg>
-                  Creating account...
-                </span>
-              ) : 'Create Account'}
-            </button>
-          </form>
           <div className="mt-6 text-center">
             <p className="text-gray-500 text-sm">
               Already have an account?{' '}
-              <Link to="/login" className="text-purple-400 hover:text-purple-300 font-medium transition">
-                Sign In
-              </Link>
+              <Link to="/login" className="text-purple-400 hover:text-purple-300 font-medium transition">Sign In</Link>
             </p>
           </div>
         </div>
 
-        {/* Features */}
-        <div className="mt-8 space-y-3">
-          {[
-            { icon: '🤖', text: 'AI strategies trade 24/7 while you sleep', color: 'blue' },
-            { icon: '📊', text: 'Copy top traders with one click', color: 'purple' },
-            { icon: '🔒', text: 'Your funds stay in your own Coinbase account', color: 'green' },
-          ].map((f, i) => (
-            <div key={i} className="backdrop-blur-lg bg-white/5 border border-white/5 rounded-xl px-4 py-3 flex items-center gap-3">
-              <span className="text-xl">{f.icon}</span>
-              <span className="text-gray-400 text-sm">{f.text}</span>
-            </div>
-          ))}
-        </div>
+        {step === 'register' && (
+          <div className="mt-8 space-y-3">
+            {[
+              { icon: '🤖', text: 'AI strategies trade 24/7 while you sleep' },
+              { icon: '📊', text: 'Copy top traders with one click' },
+              { icon: '🔒', text: 'Your funds stay in your own Coinbase account' },
+            ].map((f, i) => (
+              <div key={i} className="backdrop-blur-lg bg-white/5 border border-white/5 rounded-xl px-4 py-3 flex items-center gap-3">
+                <span className="text-xl">{f.icon}</span>
+                <span className="text-gray-400 text-sm">{f.text}</span>
+              </div>
+            ))}
+          </div>
+        )}
       </div>
-
-      <style>{`
-        @keyframes float {
-          0%, 100% { transform: translateY(0px) translateX(0px); opacity: 0.4; }
-          25% { transform: translateY(-20px) translateX(10px); opacity: 0.8; }
-          50% { transform: translateY(-10px) translateX(-10px); opacity: 0.3; }
-          75% { transform: translateY(-30px) translateX(5px); opacity: 0.7; }
-        }
-      `}</style>
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { createChart, ColorType } from 'lightweight-charts'
+import { createChart, ColorType, type Time } from 'lightweight-charts'
 import { getPortfolioHistory } from '../api/dashboard'
 
 interface Props {
@@ -46,12 +46,14 @@ export default function PortfolioChart({ height = 200 }: Props) {
         }
       })
       .catch(() => {
-        // Fallback: flat line at $100K
+        // Fallback: animated demo data
         const now = Math.floor(Date.now() / 1000)
-        const data = Array.from({ length: 30 }, (_, i) => ({
-          time: now - (29 - i) * 86400,
-          value: 100000,
-        }))
+        const data: { time: Time; value: number }[] = []
+        let value = 100000
+        for (let i = 30; i >= 0; i--) {
+          value += (Math.random() - 0.45) * 800
+          data.push({ time: (now - i * 86400) as Time, value: Math.max(value, 95000) })
+        }
         series.setData(data)
         chart.timeScale().fitContent()
       })

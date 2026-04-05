@@ -1,6 +1,7 @@
 import { Link, useLocation, Outlet } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import AnimatedBackground from './AnimatedBackground'
+import GlobalFooter from './GlobalFooter'
 
 const variantMap: Record<string, 'default' | 'trading' | 'strategy' | 'history' | 'settings'> = {
   '/dashboard': 'trading',
@@ -94,6 +95,7 @@ export default function Layout() {
             <Outlet />
           </div>
         </div>
+        <GlobalFooter />
       </main>
     </div>
   )

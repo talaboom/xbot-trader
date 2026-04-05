@@ -6,6 +6,8 @@ interface User {
   email: string
   username: string
   is_paper_mode: boolean
+  subscription_tier: string
+  subscription_status: string
 }
 
 interface AuthCtx {
@@ -13,6 +15,7 @@ interface AuthCtx {
   loading: boolean
   setTokens: (access: string, refresh: string) => void
   logout: () => void
+  refreshUser: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthCtx>({
@@ -20,6 +23,7 @@ const AuthContext = createContext<AuthCtx>({
   loading: true,
   setTokens: () => {},
   logout: () => {},
+  refreshUser: async () => {},
 })
 
 export function AuthProvider({ children }: { children: ReactNode }) {
@@ -60,7 +64,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }
 
   return (
-    <AuthContext.Provider value={{ user, loading, setTokens, logout }}>
+    <AuthContext.Provider value={{ user, loading, setTokens, logout, refreshUser: fetchUser }}>
       {children}
     </AuthContext.Provider>
   )

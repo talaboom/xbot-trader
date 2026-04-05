@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import client from '../api/client'
+import { createCheckoutSession } from '../api/payments'
 
 const plans = [
   { id: 'trader', name: 'Trader', price: 20, period: '/month' },
@@ -40,7 +41,9 @@ const cryptoWallets = [
 
 export default function PaymentPage() {
   const { user } = useAuth()
-  const [selectedPlan, setSelectedPlan] = useState('trader')
+  const [searchParams] = useSearchParams()
+  const [selectedPlan, setSelectedPlan] = useState(searchParams.get('plan') || 'trader')
+  const [stripeLoading, setStripeLoading] = useState(false)
   const [payMethod, setPayMethod] = useState<'card' | 'crypto'>('crypto')
   const [selectedCrypto, setSelectedCrypto] = useState(0)
   const [copied, setCopied] = useState(false)
@@ -139,14 +142,11 @@ export default function PaymentPage() {
                   <p className="text-white font-medium text-sm">Crypto</p>
                   <p className="text-gray-500 text-xs">SOL, ETH, BTC</p>
                 </button>
-                <button onClick={() => setPayMethod('card')}
-                  className={`p-4 rounded-xl border text-center transition-all ${
-                    payMethod === 'card' ? 'border-blue-500/50 bg-blue-500/10' : 'border-white/10 hover:border-white/20'
-                  }`}>
+                <div className="p-4 rounded-xl border border-white/5 text-center opacity-40 cursor-not-allowed">
                   <span className="text-2xl block mb-1">💳</span>
                   <p className="text-white font-medium text-sm">Credit Card</p>
-                  <p className="text-gray-500 text-xs">Via Stripe</p>
-                </button>
+                  <p className="text-gray-500 text-xs">Coming Soon</p>
+                </div>
               </div>
 
               {payMethod === 'crypto' ? (
@@ -210,16 +210,26 @@ export default function PaymentPage() {
                   </div>
                 </div>
               ) : (
-                /* Card payment — Stripe placeholder */
+                /* Card payment — Stripe Checkout */
                 <div className="text-center py-8">
                   <span className="text-5xl block mb-4">💳</span>
-                  <h3 className="text-xl font-bold text-white mb-2">Card Payment Coming Soon</h3>
-                  <p className="text-gray-400 mb-4">Credit/debit card payments via Stripe will be available shortly.</p>
-                  <p className="text-gray-500 text-sm">For now, pay with crypto — it's faster and cheaper!</p>
-                  <button onClick={() => setPayMethod('crypto')}
-                    className="mt-4 bg-gradient-to-r from-purple-600 to-pink-500 px-6 py-2.5 rounded-xl font-semibold text-sm shadow-lg shadow-purple-500/25 transition">
-                    Pay with Crypto Instead
+                  <h3 className="text-xl font-bold text-white mb-2">Pay with Card</h3>
+                  <p className="text-gray-400 mb-4">Secure checkout powered by Stripe. All major cards accepted.</p>
+                  <button
+                    onClick={async () => {
+                      setStripeLoading(true)
+                      try {
+                        const res = await createCheckoutSession(selectedPlan)
+                        window.location.href = res.data.checkout_url
+                      } catch {
+                        setStripeLoading(false)
+                      }
+                    }}
+                    disabled={stripeLoading}
+                    className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 disabled:from-gray-700 disabled:to-gray-700 py-3.5 rounded-xl font-semibold transition shadow-lg shadow-blue-500/25">
+                    {stripeLoading ? 'Redirecting to Stripe...' : `Subscribe — $${plan.price}/month`}
                   </button>
+                  <p className="text-gray-500 text-xs mt-3">You'll be redirected to Stripe's secure checkout page.</p>
                 </div>
               )}
             </div>

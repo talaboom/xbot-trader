@@ -1,30 +1,81 @@
-"""Payment verification API — handles crypto payment submissions."""
-
-from datetime import datetime, timezone
+"""Payment API — Stripe checkout, portal, and crypto payment submissions."""
 
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
-from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
 from app.database import get_db
 from app.models.user import User
+from app.services.stripe_service import (
+    create_checkout_session,
+    create_portal_session,
+    get_or_create_customer,
+    get_price_for_plan,
+)
 
 router = APIRouter(prefix="/payments", tags=["payments"])
 
 
-class CryptoPaymentSubmit(BaseModel):
+# ── Stripe Checkout ──
+
+
+class CheckoutRequest(BaseModel):
     plan: str  # "trader" or "pro"
-    currency: str  # "SOL", "ETH", "BTC"
+
+
+@router.post("/stripe/checkout")
+async def stripe_checkout(
+    data: CheckoutRequest,
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Create a Stripe Checkout session and return the URL."""
+    price_id = get_price_for_plan(data.plan)
+    if not price_id:
+        raise HTTPException(status_code=400, detail="Invalid plan. Choose 'trader' or 'pro'.")
+
+    customer_id = await get_or_create_customer(user, db)
+    checkout_url = await create_checkout_session(customer_id, price_id, str(user.id))
+    return {"checkout_url": checkout_url}
+
+
+@router.post("/stripe/portal")
+async def stripe_portal(
+    user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
+):
+    """Create a Stripe Customer Portal session for subscription management."""
+    if not user.stripe_customer_id:
+        raise HTTPException(status_code=400, detail="No active subscription found.")
+
+    portal_url = create_portal_session(user.stripe_customer_id)
+    return {"portal_url": portal_url}
+
+
+# ── Subscription Status ──
+
+
+@router.get("/status")
+async def get_payment_status(
+    user: User = Depends(get_current_user),
+):
+    """Get user's current subscription status."""
+    return {
+        "plan": user.subscription_tier,
+        "status": user.subscription_status,
+        "is_active": user.subscription_status == "active",
+    }
+
+
+# ── Crypto Payments (kept for alternative payment) ──
+
+
+class CryptoPaymentSubmit(BaseModel):
+    plan: str
+    currency: str
     tx_hash: str
     amount_usd: float
-
-
-class PaymentStatusResponse(BaseModel):
-    status: str
-    plan: str | None = None
-    message: str
 
 
 @router.post("/crypto/submit")
@@ -33,7 +84,7 @@ async def submit_crypto_payment(
     user: User = Depends(get_current_user),
     db: AsyncSession = Depends(get_db),
 ):
-    """Submit a crypto payment transaction hash for verification."""
+    """Submit a crypto payment transaction hash for manual verification."""
     if data.plan not in ("trader", "pro"):
         raise HTTPException(status_code=400, detail="Invalid plan")
     if not data.tx_hash.strip():
@@ -41,28 +92,10 @@ async def submit_crypto_payment(
     if data.currency not in ("SOL", "ETH", "BTC"):
         raise HTTPException(status_code=400, detail="Unsupported currency")
 
-    # In production: verify the transaction on-chain using blockchain APIs
-    # For now, record the submission for manual review
-    # TODO: Add Payment model to track payment history
-
     return {
         "status": "pending",
         "message": f"Payment submitted. Your {data.plan.capitalize()} plan will be activated within 15 minutes after verification.",
         "tx_hash": data.tx_hash,
         "plan": data.plan,
         "currency": data.currency,
-    }
-
-
-@router.get("/status")
-async def get_payment_status(
-    user: User = Depends(get_current_user),
-):
-    """Check the user's current subscription status."""
-    # For MVP: all users are on free/paper mode
-    # In production: check payment records and subscription expiry
-    return {
-        "plan": "free",
-        "is_active": True,
-        "message": "You're on the free plan. Upgrade to unlock live trading.",
     }

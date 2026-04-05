@@ -64,6 +64,9 @@ async def fix_db(x_admin_secret: str = Header()):
             "avatar_url": "VARCHAR(500)",
             "telegram_chat_id": "VARCHAR(50)",
             "facebook_id": "VARCHAR(255)",
+            "referral_code": "VARCHAR(20)",
+            "referred_by": "UUID REFERENCES users(id) ON DELETE SET NULL",
+            "referral_count": "INTEGER DEFAULT 0",
         }
         for col, col_type in columns.items():
             if col not in existing:

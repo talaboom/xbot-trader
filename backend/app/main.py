@@ -52,6 +52,9 @@ async def ensure_db_columns():
                 "avatar_url": "VARCHAR(500)",
                 "telegram_chat_id": "VARCHAR(50)",
                 "facebook_id": "VARCHAR(255)",
+                "referral_code": "VARCHAR(20)",
+                "referred_by": "UUID REFERENCES users(id) ON DELETE SET NULL",
+                "referral_count": "INTEGER DEFAULT 0",
             }
             for col, col_type in columns_to_add.items():
                 if col not in existing:
@@ -61,6 +64,11 @@ async def ensure_db_columns():
             # Make password_hash nullable (for OAuth users)
             await conn.execute(text(
                 "ALTER TABLE users ALTER COLUMN password_hash DROP NOT NULL"
+            ))
+
+            # Backfill referral_code for existing users
+            await conn.execute(text(
+                "UPDATE users SET referral_code = UPPER(SUBSTR(MD5(RANDOM()::TEXT), 1, 8)) WHERE referral_code IS NULL"
             ))
     except Exception as e:
         logger.error(f"DB column check failed: {e}")

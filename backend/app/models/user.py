@@ -27,6 +27,7 @@ class User(Base):
     referral_code: Mapped[str] = mapped_column(String(20), unique=True, default=_generate_referral_code)
     referred_by: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), ForeignKey("users.id", ondelete="SET NULL"))
     referral_count: Mapped[int] = mapped_column(Integer, default=0)
+    facebook_id: Mapped[str | None] = mapped_column(String(50), unique=True, nullable=True, index=True)
     stripe_customer_id: Mapped[str | None] = mapped_column(String(255), unique=True, nullable=True)
     stripe_subscription_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     subscription_tier: Mapped[str] = mapped_column(String(20), default="free", server_default="free")

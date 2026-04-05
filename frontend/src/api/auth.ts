@@ -13,3 +13,6 @@ export const login = (email: string, password: string) =>
   client.post('/auth/login', { email, password })
 
 export const getMe = () => client.get('/auth/me')
+
+export const loginWithFacebook = (accessToken: string) =>
+  client.post('/auth/facebook', { access_token: accessToken })

@@ -1,11 +1,14 @@
+import uuid
 from datetime import datetime, timedelta, timezone
 
+import httpx
 from fastapi import APIRouter, Depends, HTTPException, Request, status
 from pydantic import BaseModel
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
+from app.config import settings
 from app.database import get_db
 from app.models.user import User
 from app.schemas.user import TokenRefresh, TokenResponse, UserLogin, UserRegister, UserResponse
@@ -188,6 +191,77 @@ async def refresh(data: TokenRefresh, db: AsyncSession = Depends(get_db)):
     user = result.scalar_one_or_none()
     if not user or not user.is_active:
         raise HTTPException(status_code=401, detail="User not found")
+
+    token_data = {"sub": str(user.id)}
+    return TokenResponse(
+        access_token=create_access_token(token_data),
+        refresh_token=create_refresh_token(token_data),
+    )
+
+
+class FacebookLoginRequest(BaseModel):
+    access_token: str
+
+
+@router.post("/facebook", response_model=TokenResponse)
+async def facebook_login(data: FacebookLoginRequest, db: AsyncSession = Depends(get_db)):
+    # Fetch user info from Facebook Graph API
+    async with httpx.AsyncClient() as client:
+        resp = await client.get(
+            "https://graph.facebook.com/me",
+            params={"fields": "id,name,email", "access_token": data.access_token},
+            timeout=10.0,
+        )
+
+    if resp.status_code != 200 or "error" in resp.json():
+        raise HTTPException(status_code=401, detail="Invalid Facebook token")
+
+    fb_data = resp.json()
+    fb_id: str = fb_data.get("id", "")
+    fb_name: str = fb_data.get("name", "")
+    fb_email: str | None = fb_data.get("email")
+
+    if not fb_email:
+        raise HTTPException(
+            status_code=400,
+            detail="Facebook account has no email address. Please use email/password login.",
+        )
+
+    # Find existing user by email or facebook_id
+    result = await db.execute(
+        select(User).where((User.email == fb_email) | (User.facebook_id == fb_id))
+    )
+    user = result.scalar_one_or_none()
+
+    if user:
+        if not user.is_active:
+            raise HTTPException(status_code=403, detail="Account is disabled")
+        # Store facebook_id if not yet linked
+        if not user.facebook_id:
+            user.facebook_id = fb_id
+            await db.commit()
+    else:
+        # Create new user from Facebook data
+        base_username = (fb_name.lower().replace(" ", "_") or "user")[:20]
+        username = base_username
+        suffix = 1
+        while True:
+            check = await db.execute(select(User).where(User.username == username))
+            if not check.scalar_one_or_none():
+                break
+            username = f"{base_username}{suffix}"
+            suffix += 1
+
+        user = User(
+            email=fb_email,
+            username=username,
+            password_hash=hash_password(uuid.uuid4().hex),  # unusable random password
+            is_email_verified=True,
+            facebook_id=fb_id,
+        )
+        db.add(user)
+        await db.commit()
+        await db.refresh(user)
 
     token_data = {"sub": str(user.id)}
     return TokenResponse(

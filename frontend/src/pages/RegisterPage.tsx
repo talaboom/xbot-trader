@@ -1,7 +1,11 @@
 import { useState } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
-import { register, verifyEmail, resendCode } from '../api/auth'
+import { register, verifyEmail, resendCode, loginWithFacebook } from '../api/auth'
 import { useAuth } from '../contexts/AuthContext'
+
+declare const FB: {
+  login: (cb: (res: { authResponse?: { accessToken: string }; status: string }) => void, opts: { scope: string }) => void
+}
 
 export default function RegisterPage() {
   const [searchParams] = useSearchParams()
@@ -12,9 +16,29 @@ export default function RegisterPage() {
   const [code, setCode] = useState('')
   const [error, setError] = useState('')
   const [loading, setLoading] = useState(false)
+  const [fbLoading, setFbLoading] = useState(false)
   const [step, setStep] = useState<'register' | 'verify'>('register')
   const { setTokens } = useAuth()
   const navigate = useNavigate()
+
+  const handleFacebookLogin = () => {
+    setError('')
+    setFbLoading(true)
+    FB.login(async (response) => {
+      if (response.authResponse?.accessToken) {
+        try {
+          const res = await loginWithFacebook(response.authResponse.accessToken)
+          setTokens(res.data.access_token, res.data.refresh_token)
+          navigate('/dashboard')
+        } catch (err: any) {
+          setError(err.response?.data?.detail || 'Facebook login failed')
+          setFbLoading(false)
+        }
+      } else {
+        setFbLoading(false)
+      }
+    }, { scope: 'email' })
+  }
 
   const handleRegister = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -157,7 +181,26 @@ export default function RegisterPage() {
               </div>
             </>
           )}
-          <div className="mt-6 text-center">
+          {step === 'register' && (
+            <div className="mt-6">
+              <div className="flex items-center gap-3 mb-4">
+                <div className="flex-1 h-px bg-white/10" />
+                <span className="text-gray-500 text-xs">or</span>
+                <div className="flex-1 h-px bg-white/10" />
+              </div>
+              <button
+                onClick={handleFacebookLogin}
+                disabled={fbLoading || loading}
+                className="w-full flex items-center justify-center gap-3 bg-[#1877F2] hover:bg-[#166fe5] disabled:bg-[#1877F2]/50 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-blue-900/30"
+              >
+                <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M24 12.073c0-6.627-5.373-12-12-12s-12 5.373-12 12c0 5.99 4.388 10.954 10.125 11.854v-8.385H7.078v-3.47h3.047V9.43c0-3.007 1.792-4.669 4.533-4.669 1.312 0 2.686.235 2.686.235v2.953H15.83c-1.491 0-1.956.925-1.956 1.874v2.25h3.328l-.532 3.47h-2.796v8.385C19.612 23.027 24 18.062 24 12.073z"/>
+                </svg>
+                {fbLoading ? 'Connecting...' : 'Continue with Facebook'}
+              </button>
+            </div>
+          )}
+          <div className="mt-5 text-center">
             <p className="text-gray-500 text-sm">
               Already have an account?{' '}
               <Link to="/login" className="text-purple-400 hover:text-purple-300 font-medium transition">Sign In</Link>

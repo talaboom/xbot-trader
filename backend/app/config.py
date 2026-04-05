@@ -21,6 +21,8 @@ class Settings(BaseSettings):
     STRIPE_PRICE_TRADER: str = ""
     STRIPE_PRICE_PRO: str = ""
     FRONTEND_URL: str = "http://localhost:3000"
+    FACEBOOK_APP_ID: str = ""
+    FACEBOOK_APP_SECRET: str = ""
 
     class Config:
         env_file = ".env"

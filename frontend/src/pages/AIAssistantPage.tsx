@@ -15,7 +15,7 @@ const avatarOptions = {
 
 export default function AIAssistantPage() {
   const [messages, setMessages] = useState<Message[]>([
-    { role: 'assistant', text: "Hey! I'm your AI trading assistant. I can help you pick strategies, explain how crypto trading works, or answer any questions. What would you like to know?", suggestions: ["What strategy should I use?", "Explain DCA trading", "I'm new to crypto", "Show current prices"] }
+    { role: 'assistant', text: "Welcome! I'm your **Professional AI Crypto Consultant**. I provide expert guidance on cryptocurrency trading, market analysis, portfolio strategy, and risk management.\n\nWhether you're a beginner or experienced trader, I'm here to help you make smarter decisions. What would you like to discuss?", suggestions: ["Analyze the current market", "What strategy fits my risk level?", "I'm new to crypto — where do I start?", "Show current prices & trends"] }
   ])
   const [input, setInput] = useState('')
   const [loading, setLoading] = useState(false)
@@ -63,7 +63,7 @@ export default function AIAssistantPage() {
           </div>
           <div>
             <h1 className="text-xl font-bold text-white">{avatar.name}</h1>
-            <p className="text-xs text-gray-400">Your AI Trading Assistant</p>
+            <p className="text-xs text-gray-400">Professional AI Crypto Consultant</p>
           </div>
           <span className="flex items-center gap-1 text-xs text-green-400 ml-2">
             <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" /> Online

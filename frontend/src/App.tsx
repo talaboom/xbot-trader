@@ -1,51 +1,63 @@
+import { lazy, Suspense } from 'react'
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import { AuthProvider } from './contexts/AuthContext'
 import { ToastProvider } from './components/Toast'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
-import LandingPage from './pages/LandingPage'
-import LoginPage from './pages/LoginPage'
-import RegisterPage from './pages/RegisterPage'
-import PricingPage from './pages/PricingPage'
-import PaymentPage from './pages/PaymentPage'
-import PaymentSuccessPage from './pages/PaymentSuccessPage'
-import DashboardPage from './pages/DashboardPage'
-import StrategiesPage from './pages/StrategiesPage'
-import TradeHistoryPage from './pages/TradeHistoryPage'
-import SettingsPage from './pages/SettingsPage'
-import LeaderboardPage from './pages/LeaderboardPage'
-import MarketPage from './pages/MarketPage'
-import AIAssistantPage from './pages/AIAssistantPage'
-import TermsPage from './pages/TermsPage'
-import PrivacyPage from './pages/PrivacyPage'
-import RiskPage from './pages/RiskPage'
+
+const LandingPage        = lazy(() => import('./pages/LandingPage'))
+const LoginPage          = lazy(() => import('./pages/LoginPage'))
+const RegisterPage       = lazy(() => import('./pages/RegisterPage'))
+const PricingPage        = lazy(() => import('./pages/PricingPage'))
+const PaymentPage        = lazy(() => import('./pages/PaymentPage'))
+const PaymentSuccessPage = lazy(() => import('./pages/PaymentSuccessPage'))
+const DashboardPage      = lazy(() => import('./pages/DashboardPage'))
+const StrategiesPage     = lazy(() => import('./pages/StrategiesPage'))
+const TradeHistoryPage   = lazy(() => import('./pages/TradeHistoryPage'))
+const SettingsPage       = lazy(() => import('./pages/SettingsPage'))
+const LeaderboardPage    = lazy(() => import('./pages/LeaderboardPage'))
+const MarketPage         = lazy(() => import('./pages/MarketPage'))
+const AIAssistantPage    = lazy(() => import('./pages/AIAssistantPage'))
+const TermsPage          = lazy(() => import('./pages/TermsPage'))
+const PrivacyPage        = lazy(() => import('./pages/PrivacyPage'))
+const RiskPage           = lazy(() => import('./pages/RiskPage'))
+
+function PageLoader() {
+  return (
+    <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', height: '100vh' }}>
+      <span style={{ color: '#10b981', fontSize: '14px' }}>Loading...</span>
+    </div>
+  )
+}
 
 function App() {
   return (
     <AuthProvider>
       <ToastProvider>
-      <BrowserRouter>
-        <Routes>
-          <Route path="/" element={<LandingPage />} />
-          <Route path="/login" element={<LoginPage />} />
-          <Route path="/register" element={<RegisterPage />} />
-          <Route path="/pricing" element={<PricingPage />} />
-          <Route path="/payment" element={<PaymentPage />} />
-          <Route path="/payment/success" element={<PaymentSuccessPage />} />
-          <Route path="/terms" element={<TermsPage />} />
-          <Route path="/privacy" element={<PrivacyPage />} />
-          <Route path="/risk" element={<RiskPage />} />
-          <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-            <Route path="/dashboard" element={<DashboardPage />} />
-            <Route path="/markets" element={<MarketPage />} />
-            <Route path="/strategies" element={<StrategiesPage />} />
-            <Route path="/assistant" element={<AIAssistantPage />} />
-            <Route path="/leaderboard" element={<LeaderboardPage />} />
-            <Route path="/trades" element={<TradeHistoryPage />} />
-            <Route path="/settings" element={<SettingsPage />} />
-          </Route>
-        </Routes>
-      </BrowserRouter>
+        <BrowserRouter>
+          <Suspense fallback={<PageLoader />}>
+            <Routes>
+              <Route path="/"               element={<LandingPage />} />
+              <Route path="/login"          element={<LoginPage />} />
+              <Route path="/register"       element={<RegisterPage />} />
+              <Route path="/pricing"        element={<PricingPage />} />
+              <Route path="/payment"        element={<PaymentPage />} />
+              <Route path="/payment/success" element={<PaymentSuccessPage />} />
+              <Route path="/terms"          element={<TermsPage />} />
+              <Route path="/privacy"        element={<PrivacyPage />} />
+              <Route path="/risk"           element={<RiskPage />} />
+              <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+                <Route path="/dashboard"   element={<DashboardPage />} />
+                <Route path="/markets"     element={<MarketPage />} />
+                <Route path="/strategies"  element={<StrategiesPage />} />
+                <Route path="/assistant"   element={<AIAssistantPage />} />
+                <Route path="/leaderboard" element={<LeaderboardPage />} />
+                <Route path="/trades"      element={<TradeHistoryPage />} />
+                <Route path="/settings"    element={<SettingsPage />} />
+              </Route>
+            </Routes>
+          </Suspense>
+        </BrowserRouter>
       </ToastProvider>
     </AuthProvider>
   )

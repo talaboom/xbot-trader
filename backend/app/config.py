@@ -29,6 +29,8 @@ class Settings(BaseSettings):
     MICROSOFT_CLIENT_SECRET: str = ""
     FACEBOOK_APP_ID: str = ""
     FACEBOOK_APP_SECRET: str = ""
+    TELEGRAM_BOT_TOKEN: str = ""
+    TELEGRAM_CHANNEL_URL: str = "https://t.me/xbottrader"
 
     class Config:
         env_file = ".env"

@@ -22,6 +22,7 @@ class User(Base):
     oauth_provider: Mapped[str | None] = mapped_column(String(20), nullable=True)  # "google" or "microsoft"
     oauth_id: Mapped[str | None] = mapped_column(String(255), nullable=True)
     avatar_url: Mapped[str | None] = mapped_column(String(500), nullable=True)
+    telegram_chat_id: Mapped[str | None] = mapped_column(String(50), nullable=True)
     is_active: Mapped[bool] = mapped_column(Boolean, default=True)
     is_email_verified: Mapped[bool] = mapped_column(Boolean, default=False, server_default="false")
     email_verify_code: Mapped[str | None] = mapped_column(String(6), nullable=True)

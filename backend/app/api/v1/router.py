@@ -9,6 +9,7 @@ from app.api.v1.trades import router as trades_router
 from app.api.v1.ai_assistant import router as ai_router
 from app.api.v1.payments import router as payments_router
 from app.api.v1.referrals import router as referrals_router
+from app.api.v1.admin import router as admin_router
 
 api_router = APIRouter()
 api_router.include_router(auth_router)
@@ -20,6 +21,7 @@ api_router.include_router(ai_router)
 api_router.include_router(leaderboard_router)
 api_router.include_router(payments_router)
 api_router.include_router(referrals_router)
+api_router.include_router(admin_router)
 
 
 @api_router.get("/ping")

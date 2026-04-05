@@ -100,27 +100,30 @@ async def get_personality_config(data: PersonalityConfigRequest, user: User = De
 @router.post("/chat")
 async def chat(msg: ChatMessage, user: User = Depends(get_current_user)):
     """AI assistant chat — uses Claude API if available, falls back to rule-based."""
-    message = msg.message
-
-    # Try AI APIs — DeepSeek first, then Claude, then fallback
     try:
+        message = msg.message
+
+        # Try AI APIs — DeepSeek first, then Claude, then fallback
         if DEEPSEEK_API_KEY:
-            result = await _deepseek_chat(message, user.username, msg.history)
-            if result:
-                return result
+            try:
+                result = await _deepseek_chat(message, user.username, msg.history)
+                if result:
+                    return result
+            except Exception as e:
+                logger.error(f"DeepSeek error: {e}")
 
         if ANTHROPIC_API_KEY:
-            result = await _claude_chat(message, user.username, msg.history)
-            if result:
-                return result
-    except Exception as e:
-        logger.error(f"AI API error: {e}")
+            try:
+                result = await _claude_chat(message, user.username, msg.history)
+                if result:
+                    return result
+            except Exception as e:
+                logger.error(f"Claude error: {e}")
 
-    # Fallback to rule-based responses
-    try:
+        # Fallback to rule-based responses
         return await _rule_based_chat(msg, user)
     except Exception as e:
-        logger.error(f"Rule-based chat error: {e}")
+        logger.error(f"Chat endpoint error: {e}", exc_info=True)
         return {
             "response": f"Hey {user.username}! I can help you with trading strategies, market analysis, and crypto education. What would you like to know?",
             "suggestions": ["What strategy should I use?", "Explain DCA trading", "How does Grid trading work?", "Show current prices"]

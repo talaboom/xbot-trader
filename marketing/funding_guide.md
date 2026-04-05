@@ -1,15 +1,44 @@
 # X Bot Trader — Funding & Sponsorship Guide
 
+## YOUR PROFILE
+- 45 years old, Canadian + Bulgarian citizen (EU passport)
+- University student (but doesn't qualify for student-specific discounts/programs)
+- Has a house and car (disqualifies from some need-based programs)
+- Bank accounts in Canada + Bulgaria
+- Live SaaS product deployed and working
+- Looking for: grants, investors, sponsors — NO age caps, NO student-only
+
+---
+
 ## IMMEDIATE (This Week — $0 Cost)
 
-### 1. Apply to Canadian Startup Programs
-These are FREE money — grants, not loans:
+### 1. Canadian Funding (No Age Caps)
 
-**Futurpreneur Canada** — futurpreneur.ca
-- Up to $60,000 loan + mentoring
-- Ages 18-39, Canadian resident
-- They love tech startups
-- Apply online, takes 2-3 weeks
+**BDC (Business Development Bank of Canada)** — bdc.ca
+- Startup loans $25K-100K+ — NO age limit
+- They specifically fund tech startups
+- Lower rates than banks
+- Apply online
+
+**IRAP (NRC Industrial Research Assistance Program)** — nrc.canada.ca/irap
+- Up to $50K for tech R&D — NO age limit
+- Your AI/ML trading bot development qualifies
+- Free business advisors included
+- One of the best Canadian programs
+
+**SR&ED Tax Credits (CRA)**
+- Get 35% of your development costs back as a tax refund
+- All the coding you did building X Bot Trader qualifies
+- File with your taxes — can be retroactive
+- Could be worth $10K-30K depending on hours spent
+
+**Canada Small Business Financing Program**
+- Government-backed loans up to $350K
+- Any Canadian business owner, no age limit
+
+**CanExport Innovation** — tradecommissioner.gc.ca
+- Up to $75K to help Canadian tech expand internationally
+- Your EU citizenship + Bulgarian bank = international angle
 
 **Canada Digital Adoption Program (CDAP)**
 - Up to $15,000 grant for digital businesses
@@ -19,13 +48,37 @@ These are FREE money — grants, not loans:
 - Government grants for tech companies
 - $10K-150K depending on stage
 
-**Ontario Centre of Innovation (if in Ontario)**
-- Market Readiness grants up to $50K
+### 2. EU / Bulgarian Funding (Your EU Passport Unlocks These)
 
-**Alberta Innovates (if in Alberta)**
-- Digital Innovation grants
+**EU Horizon Europe — EIC Accelerator**
+- Up to €2.5 MILLION for tech startups
+- Any EU citizen can apply
+- Your Bulgarian passport qualifies you
+- AI + fintech is a priority area
 
-### 2. Startup Accelerators (FREE — they invest in you)
+**Bulgaria Innovation Fund**
+- Grants for Bulgarian tech entrepreneurs
+- Apply through your Bulgarian bank/business registration
+
+**Startup Bulgaria** — startupbulgaria.com
+- Grants up to €50K for Bulgarian founders
+- Sofia has a growing fintech ecosystem
+
+**EU SME Instrument**
+- €50K for feasibility, up to €2.5M for scaling
+- For small businesses in EU member states
+
+**JEREMIE Bulgaria**
+- EU-backed venture funding for Bulgarian startups
+- Equity investments for early-stage companies
+
+**How to access EU funding:**
+1. Register a company in Bulgaria (cheap and fast — can do online)
+2. Apply to EU grants as a Bulgarian company
+3. Keep your Canadian company too — dual presence
+4. This gives you access to BOTH Canadian and EU funding pools
+
+### 3. Startup Accelerators (FREE — they invest in you)
 Apply to all of these NOW:
 
 **Y Combinator** — ycombinator.com

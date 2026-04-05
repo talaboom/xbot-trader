@@ -133,6 +133,12 @@ export default function LoginPage() {
                 </span>
               ) : 'Sign In'}
             </button>
+            <p className="text-center text-xs text-gray-500 mt-3">
+              By signing in, you agree to our{' '}
+              <Link to="/terms" className="text-blue-400 hover:underline">Terms of Service</Link>
+              {' '}and{' '}
+              <Link to="/privacy" className="text-blue-400 hover:underline">Privacy Policy</Link>
+            </p>
           </form>
           <div className="mt-6 text-center">
             <p className="text-gray-500 text-sm">

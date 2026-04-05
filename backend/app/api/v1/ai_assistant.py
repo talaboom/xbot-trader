@@ -84,7 +84,7 @@ async def chat(msg: ChatMessage, user: User = Depends(get_current_user)):
             return result
 
     # Fallback to rule-based responses
-    return await _rule_based_chat(message, user)
+    return await _rule_based_chat(msg, user)
 
 
 async def _claude_chat(message: str, username: str, history: list | None = None) -> dict | None:

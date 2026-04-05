@@ -5,6 +5,7 @@ WORKDIR /app
 COPY package.json package-lock.json* ./
 RUN npm install
 
+ARG CACHEBUST=1
 COPY . .
 
 ENV VITE_API_URL=https://backend-production-dd0c.up.railway.app/api/v1

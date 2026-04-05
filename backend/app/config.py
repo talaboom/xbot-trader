@@ -22,6 +22,14 @@ class Settings(BaseSettings):
     STRIPE_PRICE_PRO: str = ""
     FRONTEND_URL: str = "http://localhost:3000"
 
+    # OAuth
+    GOOGLE_CLIENT_ID: str = ""
+    GOOGLE_CLIENT_SECRET: str = ""
+    MICROSOFT_CLIENT_ID: str = ""
+    MICROSOFT_CLIENT_SECRET: str = ""
+    FACEBOOK_APP_ID: str = ""
+    FACEBOOK_APP_SECRET: str = ""
+
     class Config:
         env_file = ".env"
 

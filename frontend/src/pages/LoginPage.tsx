@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link } from 'react-router-dom'
 import { login } from '../api/auth'
 import { useAuth } from '../contexts/AuthContext'
+import OAuthButtons from '../components/OAuthButtons'
 
 export default function LoginPage() {
   const [email, setEmail] = useState('')
@@ -89,6 +90,14 @@ export default function LoginPage() {
               {error}
             </div>
           )}
+          <OAuthButtons />
+
+          <div className="flex items-center gap-3 my-5">
+            <div className="flex-1 h-px bg-white/10" />
+            <span className="text-gray-500 text-xs uppercase tracking-wider">or</span>
+            <div className="flex-1 h-px bg-white/10" />
+          </div>
+
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-gray-400 text-sm mb-2 font-medium">Email</label>

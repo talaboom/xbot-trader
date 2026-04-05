@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, Link, useSearchParams } from 'react-router-dom'
 import { register, verifyEmail, resendCode } from '../api/auth'
 import { useAuth } from '../contexts/AuthContext'
+import OAuthButtons from '../components/OAuthButtons'
 
 export default function RegisterPage() {
   const [searchParams] = useSearchParams()
@@ -104,6 +105,14 @@ export default function RegisterPage() {
                   {error}
                 </div>
               )}
+              <OAuthButtons />
+
+              <div className="flex items-center gap-3 my-5">
+                <div className="flex-1 h-px bg-white/10" />
+                <span className="text-gray-500 text-xs uppercase tracking-wider">or</span>
+                <div className="flex-1 h-px bg-white/10" />
+              </div>
+
               <form onSubmit={handleRegister} className="space-y-5">
                 <div>
                   <label className="block text-gray-400 text-sm mb-2 font-medium">Email</label>

@@ -1,3 +1,4 @@
+import logging
 import os
 
 import httpx
@@ -8,6 +9,8 @@ from app.api.deps import get_current_user
 from app.models.user import User
 from app.strategies.bot_personalities import get_all_personalities, apply_personality_to_config
 from app.services.coinbase_service import get_public_price
+
+logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
@@ -100,18 +103,28 @@ async def chat(msg: ChatMessage, user: User = Depends(get_current_user)):
     message = msg.message
 
     # Try AI APIs — DeepSeek first, then Claude, then fallback
-    if DEEPSEEK_API_KEY:
-        result = await _deepseek_chat(message, user.username, msg.history)
-        if result:
-            return result
+    try:
+        if DEEPSEEK_API_KEY:
+            result = await _deepseek_chat(message, user.username, msg.history)
+            if result:
+                return result
 
-    if ANTHROPIC_API_KEY:
-        result = await _claude_chat(message, user.username, msg.history)
-        if result:
-            return result
+        if ANTHROPIC_API_KEY:
+            result = await _claude_chat(message, user.username, msg.history)
+            if result:
+                return result
+    except Exception as e:
+        logger.error(f"AI API error: {e}")
 
     # Fallback to rule-based responses
-    return await _rule_based_chat(msg, user)
+    try:
+        return await _rule_based_chat(msg, user)
+    except Exception as e:
+        logger.error(f"Rule-based chat error: {e}")
+        return {
+            "response": f"Hey {user.username}! I can help you with trading strategies, market analysis, and crypto education. What would you like to know?",
+            "suggestions": ["What strategy should I use?", "Explain DCA trading", "How does Grid trading work?", "Show current prices"]
+        }
 
 
 async def _deepseek_chat(message: str, username: str, history: list | None = None) -> dict | None:
@@ -161,8 +174,10 @@ async def _deepseek_chat(message: str, username: str, history: list | None = Non
                         pass
 
                 return {"response": text, "suggestions": suggestions}
-    except Exception:
-        pass
+            else:
+                logger.error(f"DeepSeek API error {resp.status_code}: {resp.text[:200]}")
+    except Exception as e:
+        logger.error(f"DeepSeek exception: {e}")
     return None
 
 

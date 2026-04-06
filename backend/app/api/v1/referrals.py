@@ -5,6 +5,7 @@ from sqlalchemy import select, func
 from sqlalchemy.ext.asyncio import AsyncSession
 
 from app.api.deps import get_current_user
+from app.config import settings
 from app.database import get_db
 from app.models.user import User
 
@@ -22,7 +23,7 @@ async def get_referral_info(user: User = Depends(get_current_user), db: AsyncSes
 
     return {
         "referral_code": user.referral_code,
-        "referral_link": f"https://xbottrader.shop/register?ref={user.referral_code}",
+        "referral_link": f"{settings.FRONTEND_URL}/register?ref={user.referral_code}",
         "total_referred": total_referred,
         "rewards": {
             "per_referral": "1 week free",

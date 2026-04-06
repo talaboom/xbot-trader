@@ -209,7 +209,7 @@ Hi [Name],
 
 I built X Bot Trader — an AI-powered crypto trading platform that lets beginners trade automatically with bots on their Coinbase account.
 
-The product is live at www.xbottrader.shop with:
+The product is live at xbot-trader.vercel.app with:
 - Paper trading ($100K virtual money)
 - 4 AI bot strategies
 - Real Coinbase prices
@@ -223,7 +223,7 @@ I'm raising $150K CAD pre-seed to fund marketing and multi-exchange support.
 Would you be open to a 15-minute call?
 
 [Your Name]
-www.xbottrader.shop
+xbot-trader.vercel.app
 
 ---
 

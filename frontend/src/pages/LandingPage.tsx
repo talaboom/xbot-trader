@@ -306,7 +306,7 @@ export default function LandingPage() {
             <Link to="/terms" className="hover:text-white transition">Terms</Link>
             <Link to="/privacy" className="hover:text-white transition">Privacy</Link>
             <Link to="/pricing" className="hover:text-white transition">Pricing</Link>
-            <a href="mailto:support@xbottrader.shop" className="hover:text-white transition">Support</a>
+            <a href="mailto:xbottrader@gmail.com" className="hover:text-white transition">Support</a>
           </div>
           <div className="flex items-center gap-4">
             <a href="https://facebook.com/xbottrader" target="_blank" rel="noopener noreferrer" className="text-gray-500 hover:text-[#1877F2] transition" aria-label="Facebook">

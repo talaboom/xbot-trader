@@ -107,7 +107,7 @@ async def send_payment_confirmation(to_email: str, username: str, plan: str, amo
                 <p style="color: #6b7280; margin: 15px 0 0; font-size: 13px;">All premium features are now unlocked. Happy trading!</p>
             </div>
             <div style="text-align: center;">
-                <a href="https://www.xbottrader.shop/dashboard" style="background: #10b981; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold;">Go to Dashboard</a>
+                <a href="{settings.FRONTEND_URL}/dashboard" style="background: #10b981; color: white; padding: 12px 30px; border-radius: 8px; text-decoration: none; font-weight: bold;">Go to Dashboard</a>
             </div>
         </div>
         """,

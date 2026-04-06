@@ -120,7 +120,7 @@ export default function RiskPage() {
 
           <section>
             <h2 className="text-xl font-bold text-white">10. Contact</h2>
-            <p>Questions about this disclaimer: <a href="mailto:support@xbottrader.shop" className="text-blue-400 hover:underline">support@xbottrader.shop</a></p>
+            <p>Questions about this disclaimer: <a href="mailto:xbottrader@gmail.com" className="text-blue-400 hover:underline">xbottrader@gmail.com</a></p>
           </section>
         </div>
 

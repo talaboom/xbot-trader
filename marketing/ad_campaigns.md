@@ -22,7 +22,7 @@ Headline 1: Make Crypto Work for You 24/7
 Headline 2: AI Trading — Set It & Forget It
 Headline 3: Free Paper Trading to Start
 Description 1: Stop staring at charts. X Bot Trader's AI buys and sells automatically using proven strategies. Your funds stay in your Coinbase account.
-Description 2: 4 AI personalities from Conservative to Aggressive. Pick your risk level. The bot handles the rest. xbottrader.shop
+Description 2: 4 AI personalities from Conservative to Aggressive. Pick your risk level. The bot handles the rest. xbot-trader.vercel.app
 
 **Ad Group 3: Coinbase Users**
 Keywords: coinbase trading bot, coinbase automation, coinbase api trading, coinbase auto buy, coinbase dca bot
@@ -31,7 +31,7 @@ Headline 1: Supercharge Your Coinbase Account
 Headline 2: AI Bots for Coinbase — $20/mo
 Headline 3: No Withdrawal Permissions Needed
 Description 1: Connect your Coinbase API key in 2 minutes. AI trades BTC, ETH, SOL and 5 more coins automatically. Paper trading included free.
-Description 2: DCA bot buys the dip on schedule. Grid bot profits from every price swing. Copy top traders with one click. xbottrader.shop
+Description 2: DCA bot buys the dip on schedule. Grid bot profits from every price swing. Copy top traders with one click. xbot-trader.vercel.app
 
 ---
 
@@ -77,7 +77,7 @@ Descriptions (max 90 chars each):
 **Audience:**
 - Age: 18-45
 - Interests: Cryptocurrency, Bitcoin, Coinbase, Trading, Passive Income, Fintech
-- Exclude: People who already visited xbottrader.shop (retarget separately)
+- Exclude: People who already visited xbot-trader.vercel.app (retarget separately)
 
 **Ad Set A — "While You Sleep" angle**
 Primary text: Your money could be working right now.
@@ -133,7 +133,7 @@ Primary text: Still thinking about it? Here's what you're missing:
 
 Right now, AI trading bots on X Bot Trader are executing trades 24/7 using real Coinbase prices.
 
-You visited xbottrader.shop — you were curious. Here's the thing: paper trading is completely free. $100K virtual money. Zero risk.
+You visited xbot-trader.vercel.app — you were curious. Here's the thing: paper trading is completely free. $100K virtual money. Zero risk.
 
 Try it. If you love it, go live for $20/month. If the AI doesn't make back your subscription in 30 days, we refund it.
 
@@ -150,14 +150,14 @@ CTA: Sign Up
 
 | Time | Visual | Audio/Text Overlay |
 |------|--------|-------------------|
-| 0-3s | Phone screen — xbottrader.shop loading | HOOK: "I set up a crypto trading bot in 2 minutes" |
+| 0-3s | Phone screen — xbot-trader.vercel.app loading | HOOK: "I set up a crypto trading bot in 2 minutes" |
 | 3-7s | Screen recording: Landing page → Click "Start Free" | "Step 1: Sign up" |
 | 7-11s | Screen recording: Dashboard appears, click "Create Bot" | "Step 2: Pick your strategy" |
 | 11-15s | Screen recording: Select DCA, choose Conservative, pick BTC | "I chose DCA — it buys Bitcoin on a schedule" |
 | 15-19s | Screen recording: Bot starts, status shows "Running" | "Step 3: Start the bot. That's it." |
 | 19-24s | Time-lapse: Dashboard updating, trades appearing | "Now it trades 24/7 while I do literally nothing" |
 | 24-27s | Show trade history with real fills | "Real trades. Real prices. Paper money for now." |
-| 27-30s | End card: "xbottrader.shop — $20/mo — Money-Back Guarantee" | CTA: "Link in bio" |
+| 27-30s | End card: "xbot-trader.vercel.app — $20/mo — Money-Back Guarantee" | CTA: "Link in bio" |
 
 **Music:** Upbeat lo-fi or trending TikTok sound
 **Style:** Screen recording with face cam in corner (UGC feel)
@@ -175,7 +175,7 @@ CTA: Sign Up
 | 20-26s | At gym, quick phone check — portfolio up | "Portfolio chart going up. Love to see it." |
 | 26-34s | Evening, on couch, scrolling through trade history | "12 trades today. All automated. All on my Coinbase." |
 | 34-40s | App walkthrough: show leaderboard, strategies, AI assistant | "4 AI strategies. Copy top traders. AI that explains everything." |
-| 40-45s | End card with app on phone | "xbottrader.shop — Start with paper trading. Go live for $20/mo. Money-back guarantee." |
+| 40-45s | End card with app on phone | "xbot-trader.vercel.app — Start with paper trading. Go live for $20/mo. Money-back guarantee." |
 
 **Music:** Chill trending sound
 **Style:** Authentic, lifestyle UGC — NOT polished corporate
@@ -189,7 +189,7 @@ CTA: Sign Up
 | 0-3s | Split screen: LEFT stressed trader with 6 monitors, RIGHT person relaxing | "Trading crypto the old way vs the new way" |
 | 3-7s | LEFT: red charts, panic selling | RIGHT: phone notification "+$47 profit" | "One loses sleep. One sleeps fine." |
 | 7-11s | RIGHT side expands: show X Bot Trader app | "X Bot Trader — AI trades for you 24/7" |
-| 11-15s | End card: features list + CTA | "$20/mo. Money-back guarantee. xbottrader.shop" |
+| 11-15s | End card: features list + CTA | "$20/mo. Money-back guarantee. xbot-trader.vercel.app" |
 
 **Music:** Dramatic transition sound
 **Style:** Clean, punchy, fast cuts
@@ -205,7 +205,7 @@ CTA: Sign Up
 | 6-9s | Quick cuts: DCA bot running, Grid bot executing, chart going up | "4 strategies. 8 coins. Real-time data." |
 | 9-13s | Show Coinbase logo + lock icon | "Your money stays in YOUR Coinbase. We never touch it." |
 | 13-17s | Paper trading dashboard with $100K | "Start free with $100K paper money" |
-| 17-20s | End card | "If the AI doesn't make back your $20 → full refund. xbottrader.shop" |
+| 17-20s | End card | "If the AI doesn't make back your $20 → full refund. xbot-trader.vercel.app" |
 
 **Music:** Building/energetic
 **Style:** Motion graphics + app screenshots
@@ -215,20 +215,20 @@ CTA: Sign Up
 ## UTM TRACKING LINKS
 
 **Google Ads:**
-- Search Brand: `xbottrader.shop/?utm_source=google&utm_medium=cpc&utm_campaign=brand-search`
-- Search Competitors: `xbottrader.shop/?utm_source=google&utm_medium=cpc&utm_campaign=competitor-search`
-- Display: `xbottrader.shop/?utm_source=google&utm_medium=display&utm_campaign=awareness`
+- Search Brand: `xbot-trader.vercel.app/?utm_source=google&utm_medium=cpc&utm_campaign=brand-search`
+- Search Competitors: `xbot-trader.vercel.app/?utm_source=google&utm_medium=cpc&utm_campaign=competitor-search`
+- Display: `xbot-trader.vercel.app/?utm_source=google&utm_medium=display&utm_campaign=awareness`
 
 **Meta Ads:**
-- Facebook Feed: `xbottrader.shop/?utm_source=facebook&utm_medium=paid&utm_campaign=conversions`
-- Instagram Feed: `xbottrader.shop/?utm_source=instagram&utm_medium=paid&utm_campaign=conversions`
-- Instagram Reels: `xbottrader.shop/?utm_source=instagram&utm_medium=paid&utm_campaign=reels`
-- Retargeting: `xbottrader.shop/?utm_source=meta&utm_medium=paid&utm_campaign=retarget`
+- Facebook Feed: `xbot-trader.vercel.app/?utm_source=facebook&utm_medium=paid&utm_campaign=conversions`
+- Instagram Feed: `xbot-trader.vercel.app/?utm_source=instagram&utm_medium=paid&utm_campaign=conversions`
+- Instagram Reels: `xbot-trader.vercel.app/?utm_source=instagram&utm_medium=paid&utm_campaign=reels`
+- Retargeting: `xbot-trader.vercel.app/?utm_source=meta&utm_medium=paid&utm_campaign=retarget`
 
 **Organic:**
-- TikTok: `xbottrader.shop/?utm_source=tiktok&utm_medium=organic&utm_campaign=content`
-- YouTube: `xbottrader.shop/?utm_source=youtube&utm_medium=organic&utm_campaign=shorts`
-- Link in Bio: `xbottrader.shop/?utm_source=linkinbio&utm_medium=social&utm_campaign=organic`
+- TikTok: `xbot-trader.vercel.app/?utm_source=tiktok&utm_medium=organic&utm_campaign=content`
+- YouTube: `xbot-trader.vercel.app/?utm_source=youtube&utm_medium=organic&utm_campaign=shorts`
+- Link in Bio: `xbot-trader.vercel.app/?utm_source=linkinbio&utm_medium=social&utm_campaign=organic`
 
 ---
 

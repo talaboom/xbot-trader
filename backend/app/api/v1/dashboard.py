@@ -1,3 +1,5 @@
+from collections import defaultdict
+from datetime import datetime, timedelta, timezone
 from decimal import Decimal
 
 import httpx
@@ -162,8 +164,6 @@ async def get_market_stats():
 @router.get("/portfolio-history")
 async def get_portfolio_history(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     """Build daily portfolio value series from trade history."""
-    from datetime import timedelta
-
     # Get all paper trades ordered by date
     result = await db.execute(
         select(Trade.side, Trade.total_value, Trade.fee, Trade.executed_at)
@@ -181,7 +181,6 @@ async def get_portfolio_history(user: User = Depends(get_current_user), db: Asyn
         ]
 
     # Build daily cash balance series
-    from collections import defaultdict
     daily_changes: dict[str, Decimal] = defaultdict(lambda: Decimal("0"))
 
     for side, total_value, fee, executed_at in trades:
@@ -220,8 +219,6 @@ async def get_portfolio_history(user: User = Depends(get_current_user), db: Asyn
 @router.get("/holdings")
 async def get_holdings(user: User = Depends(get_current_user), db: AsyncSession = Depends(get_db)):
     """Get real asset allocation from trade history."""
-    from datetime import timezone as tz
-
     COLORS = {
         "USD": "#22c55e", "BTC": "#f7931a", "ETH": "#627eea",
         "SOL": "#9945ff", "DOGE": "#c2a633", "ADA": "#0033ad",

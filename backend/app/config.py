@@ -1,4 +1,13 @@
+from pathlib import Path
+
 from pydantic_settings import BaseSettings
+
+# Look for .env in current dir or parent dir (supports running from backend/ or project root)
+_env_file = Path(".env")
+if not _env_file.exists():
+    _parent_env = Path("../.env")
+    if _parent_env.exists():
+        _env_file = _parent_env
 
 
 class Settings(BaseSettings):
@@ -11,6 +20,7 @@ class Settings(BaseSettings):
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
     ALLOWED_ORIGINS: str = "http://localhost:3000,https://www.xbottrader.shop,https://xbottrader.shop"
     ANTHROPIC_API_KEY: str = ""
+    DEEPSEEK_API_KEY: str = ""
     COINBASE_SANDBOX_URL: str = "https://api-sandbox.coinbase.com"
     COINBASE_PRODUCTION_URL: str = "https://api.coinbase.com"
     RESEND_API_KEY: str = ""
@@ -21,8 +31,6 @@ class Settings(BaseSettings):
     STRIPE_PRICE_TRADER: str = ""
     STRIPE_PRICE_PRO: str = ""
     FRONTEND_URL: str = "http://localhost:3000"
-    FACEBOOK_APP_ID: str = ""
-    FACEBOOK_APP_SECRET: str = ""
 
     # OAuth
     GOOGLE_CLIENT_ID: str = ""
@@ -35,7 +43,8 @@ class Settings(BaseSettings):
     TELEGRAM_CHANNEL_URL: str = "https://t.me/xbottrader"
 
     class Config:
-        env_file = ".env"
+        env_file = str(_env_file)
+        extra = "ignore"
 
 
 settings = Settings()

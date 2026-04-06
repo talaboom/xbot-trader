@@ -1,11 +1,11 @@
 import logging
-import os
 
 import httpx
 from fastapi import APIRouter, Depends
 from pydantic import BaseModel
 
 from app.api.deps import get_current_user
+from app.config import settings
 from app.models.user import User
 from app.strategies.bot_personalities import get_all_personalities, apply_personality_to_config
 from app.services.coinbase_service import get_public_price
@@ -14,8 +14,8 @@ logger = logging.getLogger(__name__)
 
 router = APIRouter(prefix="/ai", tags=["ai"])
 
-ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
-DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
+ANTHROPIC_API_KEY = settings.ANTHROPIC_API_KEY
+DEEPSEEK_API_KEY = settings.DEEPSEEK_API_KEY
 
 SYSTEM_PROMPT = """You are a Professional AI Crypto Consultant & Financial Advisor for X Bot Trader.
 

@@ -11,7 +11,7 @@ export default function PrivacyPage() {
         <div className="prose prose-invert prose-sm max-w-none space-y-6 text-gray-300">
           <section>
             <h2 className="text-xl font-bold text-white">1. Introduction</h2>
-            <p>X Bot Trader ("we", "us", "our") is committed to protecting your privacy in compliance with Canada's Personal Information Protection and Electronic Documents Act (PIPEDA) and applicable international privacy regulations. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform at xbot-trader.vercel.app.</p>
+            <p>X Bot Trader ("we", "us", "our") is committed to protecting your privacy in compliance with Canada's Personal Information Protection and Electronic Documents Act (PIPEDA) and applicable international privacy regulations. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform at aix.8bit.ca.</p>
             <p className="mt-2">This policy applies to all users who access our website, create an account, or use our services, including those who sign in via third-party authentication providers (Google, Microsoft, Facebook).</p>
           </section>
 

@@ -6,7 +6,7 @@
 **X Bot Trader**
 AI-Powered Crypto Trading for Everyone
 
-xbot-trader.vercel.app
+aix.8bit.ca
 Founded 2026 | Canada
 
 ---
@@ -67,7 +67,7 @@ The bot trades 24/7 using real Coinbase prices. Users upgrade from free paper tr
 ---
 
 ## Slide 7: Traction
-- **Product**: Fully built and deployed at xbot-trader.vercel.app
+- **Product**: Fully built and deployed at aix.8bit.ca
 - **Tech Stack**: React + FastAPI + PostgreSQL + Redis + Celery
 - **Features Live**: Paper trading, 4 AI strategies, real Coinbase prices, AI assistant, leaderboard, referral system, crypto payments
 - **PWA**: Installable as mobile app on iOS & Android (no app store needed)
@@ -155,7 +155,7 @@ Use of funds:
 
 ## Slide 13: Contact
 **X Bot Trader**
-xbot-trader.vercel.app
+aix.8bit.ca
 xbottrader@gmail.com
 
 [Your Name]

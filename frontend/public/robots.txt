@@ -7,4 +7,4 @@ Disallow: /assistant
 Disallow: /strategies
 Disallow: /payment
 
-Sitemap: https://xbot-trader.vercel.app/sitemap.xml
+Sitemap: https://aix.8bit.ca/sitemap.xml

@@ -77,7 +77,7 @@ The work involved systematic investigation through iterative development, testin
 5. If approved, you get funding for specific R&D activities
 
 ### Your Phone Script (What to Say)
-"Hi, I'm calling to inquire about IRAP funding for my technology startup. I've developed an AI-powered cryptocurrency trading platform called X Bot Trader. It's a SaaS application that uses machine learning and real-time market data to automate trading strategies. The product is live and deployed at xbot-trader.vercel.app. I'm a sole founder and Canadian citizen, and I'm looking for support to continue R&D — specifically adding multi-exchange support, developing native mobile applications, and building a backtesting engine for trading strategies. Could you help me connect with an Industrial Technology Advisor?"
+"Hi, I'm calling to inquire about IRAP funding for my technology startup. I've developed an AI-powered cryptocurrency trading platform called X Bot Trader. It's a SaaS application that uses machine learning and real-time market data to automate trading strategies. The product is live and deployed at aix.8bit.ca. I'm a sole founder and Canadian citizen, and I'm looking for support to continue R&D — specifically adding multi-exchange support, developing native mobile applications, and building a backtesting engine for trading strategies. Could you help me connect with an Industrial Technology Advisor?"
 
 ---
 
@@ -95,12 +95,12 @@ The work involved systematic investigation through iterative development, testin
 3. You'll need:
    - Business plan (use the pitch deck — it covers everything)
    - Financial projections (in the pitch deck)
-   - Proof of product (xbot-trader.vercel.app)
+   - Proof of product (aix.8bit.ca)
    - Personal financial info (they'll ask about your house, car, etc.)
    - Your business number (if you have one) or intent to incorporate
 
 ### Your Elevator Pitch for BDC
-"I've built X Bot Trader, an AI-powered crypto trading platform that's live at xbot-trader.vercel.app. It's a SaaS subscription business — $20/month for automated trading bots that work with Coinbase. The crypto trading bot market is $1.2 billion and growing 35% annually. I'm seeking $50,000 to fund marketing and product expansion to reach our first 1,000 paying subscribers. The product is fully built and deployed — I need capital for customer acquisition."
+"I've built X Bot Trader, an AI-powered crypto trading platform that's live at aix.8bit.ca. It's a SaaS subscription business — $20/month for automated trading bots that work with Coinbase. The crypto trading bot market is $1.2 billion and growing 35% annually. I'm seeking $50,000 to fund marketing and product expansion to reach our first 1,000 paying subscribers. The product is fully built and deployed — I need capital for customer acquisition."
 
 ---
 
@@ -121,7 +121,7 @@ The work involved systematic investigation through iterative development, testin
 "X Bot Trader is an AI-powered crypto trading platform that lets anyone set up automated trading bots in 2 minutes. We do for crypto trading what Robinhood did for stock trading — make it simple and accessible."
 
 **How far along are you?**
-"Product is live and deployed at xbot-trader.vercel.app. Full-stack SaaS with paper trading, 4 AI strategies, real Coinbase integration, AI assistant, referral system, and PWA mobile app. Ready for users."
+"Product is live and deployed at aix.8bit.ca. Full-stack SaaS with paper trading, 4 AI strategies, real Coinbase integration, AI assistant, referral system, and PWA mobile app. Ready for users."
 
 **Why did you pick this idea?**
 "580 million people own crypto but 90% lose money trading manually. Existing bots cost $50-200/month and require technical knowledge. I built something that anyone can set up in 2 minutes for $20/month with a money-back guarantee."
@@ -129,7 +129,7 @@ The work involved systematic investigation through iterative development, testin
 **What's your business model?**
 "SaaS subscription: Free paper trading converts to $20/month (Trader) or $50/month (Pro) for live trading. Targeting 10% free-to-paid conversion."
 
-**Demo URL:** xbot-trader.vercel.app
+**Demo URL:** aix.8bit.ca
 
 ---
 

@@ -1,5 +1,5 @@
 # X Bot Trader — Launch Day Social Posts
-## Copy-paste ready. Replace [LINK] with https://www.xbottrader.shop
+## Copy-paste ready. Replace [LINK] with https://www.xbottrader.ca
 
 ---
 
@@ -40,7 +40,7 @@ No coding. No experience needed. Start with fake money, go live when ready.
 
 Your funds stay in your own Coinbase account. We never touch your money.
 
-www.xbottrader.shop
+www.xbottrader.ca
 
 #AITrading #CryptoTrading #TradingBot #Bitcoin #Ethereum #Solana #DCA #GridTrading #AutomatedTrading #CryptoForBeginners
 
@@ -57,7 +57,7 @@ Perfect for:
 → Testing bot strategies before going live
 → Competing on the leaderboard
 
-Sign up free at www.xbottrader.shop
+Sign up free at www.xbottrader.ca
 
 #PaperTrading #CryptoSimulator #BitcoinTrading #LearnCrypto #CryptoTrading #RiskFree #TradingPractice
 
@@ -79,7 +79,7 @@ Go live for $20/month
 
 Your money stays in YOUR Coinbase account.
 
-www.xbottrader.shop
+www.xbottrader.ca
 
 ### Tweet 2: Value Prop
 "But I don't know how to trade crypto"
@@ -90,7 +90,7 @@ X Bot Trader's AI picks when to buy and sell. You just pick a strategy and set a
 
 Start with paper trading (virtual money, real prices).
 
-www.xbottrader.shop
+www.xbottrader.ca
 
 ### Tweet 3: Thread Starter
 Here's how I built an AI crypto trading platform in a week 🧵
@@ -112,7 +112,7 @@ Here's how I built an AI crypto trading platform in a week 🧵
 - Momentum - catch trends early
 - Mean Reversion - buy dips, sell spikes
 
-5/ It's live now: www.xbottrader.shop
+5/ It's live now: www.xbottrader.ca
 Free paper trading with $100K virtual money.
 $20/month for live trading.
 
@@ -129,13 +129,13 @@ $20/month for live trading.
 [Show leaderboard]
 "Compete against other traders."
 [Show landing page]
-"Start free at xbottrader.shop"
+"Start free at xbottrader.ca"
 
 ### Video 2: Tutorial (30 sec)
 **Script:**
 "How to set up your first crypto trading bot in 2 minutes"
 [Screen recording]
-1. Go to xbottrader.shop
+1. Go to xbottrader.ca
 2. Create a free account
 3. Go to Strategies
 4. Create a DCA bot for Bitcoin
@@ -154,7 +154,7 @@ $20/month for live trading.
 **Body:**
 Hey everyone,
 
-I just launched X Bot Trader (www.xbottrader.shop) — an AI-powered crypto trading simulator.
+I just launched X Bot Trader (www.xbottrader.ca) — an AI-powered crypto trading simulator.
 
 **What it does:**
 - Paper trading with $100K virtual money using real Coinbase prices
@@ -192,6 +192,6 @@ The platform allows users to:
 
 Built with a focus on education and risk management. Users can test strategies in a paper trading environment before committing real capital.
 
-Now live at www.xbottrader.shop
+Now live at www.xbottrader.ca
 
 #Fintech #AI #Cryptocurrency #Trading #Startup #Launch

@@ -22,7 +22,7 @@ async def get_referral_info(user: User = Depends(get_current_user), db: AsyncSes
 
     return {
         "referral_code": user.referral_code,
-        "referral_link": f"https://xbottrader.shop/register?ref={user.referral_code}",
+        "referral_link": f"https://xbottrader.ca/register?ref={user.referral_code}",
         "total_referred": total_referred,
         "rewards": {
             "per_referral": "1 week free",

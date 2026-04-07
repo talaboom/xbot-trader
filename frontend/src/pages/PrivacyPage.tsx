@@ -11,7 +11,7 @@ export default function PrivacyPage() {
         <div className="prose prose-invert prose-sm max-w-none space-y-6 text-gray-300">
           <section>
             <h2 className="text-xl font-bold text-white">1. Introduction</h2>
-            <p>X Bot Trader ("we", "us", "our") is committed to protecting your privacy in compliance with Canada's Personal Information Protection and Electronic Documents Act (PIPEDA) and applicable international privacy regulations. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform at xbottrader.shop.</p>
+            <p>X Bot Trader ("we", "us", "our") is committed to protecting your privacy in compliance with Canada's Personal Information Protection and Electronic Documents Act (PIPEDA) and applicable international privacy regulations. This Privacy Policy explains how we collect, use, disclose, and safeguard your information when you use our platform at xbottrader.ca.</p>
             <p className="mt-2">This policy applies to all users who access our website, create an account, or use our services, including those who sign in via third-party authentication providers (Google, Microsoft, Facebook).</p>
           </section>
 
@@ -140,7 +140,7 @@ export default function PrivacyPage() {
               <li><strong>Withdraw consent</strong> — withdraw your consent for data processing at any time</li>
               <li><strong>Complaint</strong> — file a complaint with the Office of the Privacy Commissioner of Canada</li>
             </ul>
-            <p className="mt-2">To exercise any of these rights, contact us at <a href="mailto:privacy@xbottrader.shop" className="text-blue-400 hover:underline">privacy@xbottrader.shop</a>. We will respond within 30 days.</p>
+            <p className="mt-2">To exercise any of these rights, contact us at <a href="mailto:privacy@xbottrader.ca" className="text-blue-400 hover:underline">privacy@xbottrader.ca</a>. We will respond within 30 days.</p>
           </section>
 
           <section>
@@ -165,8 +165,8 @@ export default function PrivacyPage() {
 
           <section>
             <h2 className="text-xl font-bold text-white">12. Contact</h2>
-            <p>Privacy Officer: <a href="mailto:privacy@xbottrader.shop" className="text-blue-400 hover:underline">privacy@xbottrader.shop</a></p>
-            <p>General inquiries: <a href="mailto:support@xbottrader.shop" className="text-blue-400 hover:underline">support@xbottrader.shop</a></p>
+            <p>Privacy Officer: <a href="mailto:privacy@xbottrader.ca" className="text-blue-400 hover:underline">privacy@xbottrader.ca</a></p>
+            <p>General inquiries: <a href="mailto:support@xbottrader.ca" className="text-blue-400 hover:underline">support@xbottrader.ca</a></p>
           </section>
         </div>
 

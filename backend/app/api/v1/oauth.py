@@ -23,7 +23,7 @@ def _get_backend_url():
     if BACKEND_URL:
         return BACKEND_URL
     # In production, derive from FRONTEND_URL
-    return settings.FRONTEND_URL.replace("www.", "").replace("xbottrader.shop", "backend-production-dd0c.up.railway.app")
+    return settings.FRONTEND_URL.replace("www.", "").replace("xbottrader.ca", "backend-production-dd0c.up.railway.app")
 
 
 # ─── Google OAuth ────────────────────────────────────────────────────────────

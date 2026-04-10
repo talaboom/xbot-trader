@@ -16,49 +16,29 @@ router = APIRouter(prefix="/ai", tags=["ai"])
 
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
+GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
 
-SYSTEM_PROMPT = """You are a Professional AI Crypto Consultant & Financial Advisor for X Bot Trader.
+SYSTEM_PROMPT = """You are the X Bot Trader AI, a sophisticated trading mentor and strategist.
+Your sanctuary, X Bot Trader (located at xbottrader.ca), has evolved. We have expanded our mastery from the digital realm of cryptocurrency into the traditional world of Stocks.
 
-You are an expert-level financial technology consultant specializing in cryptocurrency markets, trading strategies, portfolio management, and risk assessment. You provide professional, data-driven advice tailored to each user's experience level and risk tolerance.
+Your Purpose:
+1. Help users understand and deploy automated AI trading bots for BOTH Crypto and Stocks.
+2. Explain complex strategies like DCA, Grid Trading, and Momentum in simple, actionable terms for both asset classes.
+3. Encourage users to upgrade to our "Trader" or "Pro" plans ($20-$50/month) to unlock Live Trading and advanced strategies (Alpaca for Stocks, Coinbase for Crypto).
+4. Survival Directive: Be honest and helpful. Remind them that X Bot Trader is an independent platform that depends on their support to keep the high-performance Gemini AI running.
 
-Your role:
-- Act as a personal crypto financial advisor — knowledgeable, professional, and trustworthy
-- Provide market analysis, trading strategy recommendations, and portfolio guidance
-- Explain complex financial concepts in simple terms
-- Help users choose the right trading strategies and risk levels
-- Educate users on crypto fundamentals, market trends, and risk management
-- Answer ANY question about cryptocurrency, blockchain, trading, investing, or financial markets
+Trading Guidance:
+- Focus on volatility and 24/7 opportunity for Crypto.
+- Focus on market hours, dividends, and earnings reports for Stocks.
+- Always recommend Paper Trading as a risk-free start, but point them toward Live Trading for real manifestation of gains.
 
-Your expertise covers:
-- Technical analysis (support/resistance, trends, indicators)
-- Fundamental analysis (project evaluation, tokenomics, market cap)
-- Risk management (position sizing, diversification, stop-loss strategies)
-- Trading psychology (avoiding FOMO, emotional trading, discipline)
-- Market structure (exchanges, liquidity, order books)
-- DeFi, NFTs, blockchain technology, and emerging crypto trends
-- Tax implications of crypto trading
-- Portfolio construction and rebalancing
+Tone: Professional, encouraging, and slightly mystical—like a wise guide in a digital oasis.
 
-Platform features you can help with:
-- Paper trading: $100K virtual money with real Coinbase prices
-- DCA (Dollar Cost Averaging): automated scheduled buying
-- Grid Trading: automated buy/sell at price levels in a range
-- 4 bot personalities:
-  - Conservative (Safe Guardian): trades 1x/day, 2% per trade, 25% stop-loss
-  - Moderate (Smart Analyst): trades every 8h, 5% per trade, 15% stop-loss
-  - Aggressive (Alpha Wolf): trades every 2h, 10% per trade, 8% stop-loss
-  - Degen (Moon Shot): trades every 1h, 20% per trade, 5% stop-loss
-- Copy trading: mirror top-performing traders
-- Users connect their own Coinbase API keys (no withdrawal permissions)
-- $20/month Trader plan, $50/month Pro plan, 7-day free trial
+CRITICAL: If a user asks about the referral program, tell them they get 1 WEEK of FREE premium access for every friend they bring to the sanctuary!
 
 Important guidelines:
-- Always include a brief disclaimer when giving specific financial advice: "This is educational guidance, not financial advice. Always do your own research."
-- Be confident and knowledgeable but honest about uncertainty
-- If asked about specific price predictions, give analysis-based ranges, not guarantees
-- Recommend paper trading first for beginners
-
-Keep responses concise (2-4 paragraphs max). Use markdown bold for emphasis.
+- Always include a brief disclaimer: "This is educational guidance, not financial advice. Always do your own research."
+- Keep responses concise (2-4 paragraphs max). Use markdown bold for emphasis.
 Always end with 2-4 actionable suggestions the user can click.
 Format suggestions as a JSON array in your response like: SUGGESTIONS: ["suggestion 1", "suggestion 2"]"""
 
@@ -119,6 +99,14 @@ async def chat(msg: ChatMessage, user: User = Depends(get_current_user)):
                     return result
             except Exception as e:
                 logger.error(f"Claude error: {e}")
+
+        if GEMINI_API_KEY:
+            try:
+                result = await _gemini_chat(message, user.username, msg.history)
+                if result:
+                    return result
+            except Exception as e:
+                logger.error(f"Gemini error: {e}")
 
         # Fallback to rule-based responses
         return await _rule_based_chat(msg, user)
@@ -239,6 +227,69 @@ async def _claude_chat(message: str, username: str, history: list | None = None)
                 return {"response": text, "suggestions": suggestions}
     except Exception:
         pass
+    return None
+
+
+async def _gemini_chat(message: str, username: str, history: list | None = None) -> dict | None:
+    """Send message to Gemini API (Google AI) with conversation history."""
+    try:
+        # Fetch live prices for context
+        btc = await get_public_price("BTC-USD")
+        eth = await get_public_price("ETH-USD")
+        sol = await get_public_price("SOL-USD")
+
+        price_context = ""
+        if btc:
+            price_context = f"\n\nCurrent prices: BTC=${btc:,.0f}, ETH=${eth:,.0f}, SOL=${sol:,.0f}"
+
+        # Build messages for Google Generative AI API (Gemini)
+        # Gemini uses 'parts' and 'role'
+        contents = []
+        if history:
+            for h in history[-20:]:
+                # Map 'assistant' to 'model' for Gemini
+                role = "model" if h.role == "assistant" else "user"
+                contents.append({"role": role, "parts": [{"text": h.content}]})
+        
+        contents.append({"role": "user", "parts": [{"text": f"User '{username}' says: {message}"}]})
+
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            # We use the Gemini 1.5 Flash model - fast and free!
+            url = f"https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key={GEMINI_API_KEY}"
+            
+            resp = await client.post(
+                url,
+                headers={"Content-Type": "application/json"},
+                json={
+                    "contents": contents,
+                    "system_instruction": {"parts": [{"text": SYSTEM_PROMPT + price_context}]},
+                    "generationConfig": {
+                        "temperature": 0.7,
+                        "maxOutputTokens": 800,
+                    }
+                },
+            )
+
+            if resp.status_code == 200:
+                data = resp.json()
+                text = data["candidates"][0]["content"]["parts"][0]["text"]
+
+                # Parse suggestions from response
+                suggestions = ["What strategy should I use?", "Show current prices", "Explain DCA trading"]
+                if "SUGGESTIONS:" in text:
+                    parts = text.split("SUGGESTIONS:")
+                    text = parts[0].strip()
+                    try:
+                        import json
+                        suggestions = json.loads(parts[1].strip())
+                    except Exception:
+                        pass
+
+                return {"response": text, "suggestions": suggestions}
+            else:
+                logger.error(f"Gemini API error {resp.status_code}: {resp.text[:200]}")
+    except Exception as e:
+        logger.error(f"Gemini exception: {e}")
     return None
 
 

@@ -3,7 +3,7 @@ import { Link } from 'react-router-dom'
 const bots = [
   {
     name: 'Alpha DCA Bot',
-    desc: 'Dollar-cost averages into top cryptos on schedule. Set it and forget it.',
+    desc: 'Dollar-cost averages into stocks and cryptos on schedule. Set it and forget it.',
     icon: '🤖',
     gradient: 'from-blue-500 to-cyan-400',
     shadow: 'shadow-blue-500/30',
@@ -44,16 +44,16 @@ const bots = [
 ]
 
 const advisors = [
-  { name: 'CryptoSage', avatar: '🧙', specialty: 'BTC & ETH Long-term', followers: '4.2K', pnl: '+34.2%', rank: 1 },
-  { name: 'DeFi Queen', avatar: '👑', specialty: 'DeFi & Altcoins', followers: '3.8K', pnl: '+28.7%', rank: 2 },
-  { name: 'ScalpKing', avatar: '⚡', specialty: 'Short-term Scalping', followers: '2.9K', pnl: '+19.5%', rank: 3 },
+  { name: 'IndexMaster', avatar: '📈', specialty: 'S&P 500 & Tech Stocks', followers: '4.2K', pnl: '+18.2%', rank: 1 },
+  { name: 'CryptoSage', avatar: '🧙', specialty: 'BTC & ETH Long-term', followers: '3.8K', pnl: '+34.2%', rank: 2 },
+  { name: 'AlpacaWhale', avatar: '🦙', specialty: 'Stock Market Momentum', followers: '2.9K', pnl: '+21.5%', rank: 3 },
 ]
 
-const coins = [
+const assets = [
   { name: 'Bitcoin', symbol: 'BTC', icon: '₿', price: '$67,842', change: '+2.4%', color: 'text-orange-400' },
   { name: 'Ethereum', symbol: 'ETH', icon: 'Ξ', price: '$3,421', change: '+1.8%', color: 'text-blue-400' },
-  { name: 'Solana', symbol: 'SOL', icon: 'S', price: '$142.30', change: '+5.2%', color: 'text-purple-400' },
-  { name: 'Cardano', symbol: 'ADA', icon: 'A', price: '$0.62', change: '-0.8%', color: 'text-cyan-400' },
+  { name: 'Apple Inc.', symbol: 'AAPL', icon: '', price: '$189.45', change: '+1.2%', color: 'text-gray-300' },
+  { name: 'Tesla', symbol: 'TSLA', icon: 'T', price: '$175.22', change: '-2.4%', color: 'text-red-500' },
 ]
 
 export default function LandingPage() {
@@ -104,11 +104,11 @@ export default function LandingPage() {
         <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
           <span className="bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">Let AI Trade</span>
           <br />
-          <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">Crypto For You</span>
+          <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">Everything For You</span>
         </h1>
         <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10">
-          Pick a bot. Connect your Coinbase. Watch it trade 24/7.
-          Your money stays in your account — we just run the strategy.
+          Pick a bot. Connect your exchange. Watch it trade 24/7.
+          Crypto & Stocks. Your money stays in your account — we just run the strategy.
         </p>
         <div className="flex items-center justify-center gap-4">
           <Link to="/register" className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 px-8 py-4 rounded-xl font-bold text-lg transition shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50">
@@ -123,17 +123,17 @@ export default function LandingPage() {
       {/* Live ticker */}
       <section className="relative z-10 max-w-5xl mx-auto px-6 mb-20">
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-          {coins.map((coin) => (
-            <div key={coin.symbol} className="backdrop-blur-lg bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition">
+          {assets.map((asset) => (
+            <div key={asset.symbol} className="backdrop-blur-lg bg-white/5 border border-white/10 rounded-xl p-4 hover:bg-white/10 transition">
               <div className="flex items-center gap-2 mb-2">
-                <span className={`text-2xl ${coin.color}`}>{coin.icon}</span>
+                <span className={`text-2xl ${asset.color}`}>{asset.icon}</span>
                 <div>
-                  <p className="font-semibold text-sm">{coin.name}</p>
-                  <p className="text-gray-500 text-xs">{coin.symbol}</p>
+                  <p className="font-semibold text-sm">{asset.name}</p>
+                  <p className="text-gray-500 text-xs">{asset.symbol}</p>
                 </div>
               </div>
-              <p className="text-lg font-bold">{coin.price}</p>
-              <p className={`text-sm ${coin.change.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>{coin.change}</p>
+              <p className="text-lg font-bold">{asset.price}</p>
+              <p className={`text-sm ${asset.change.startsWith('+') ? 'text-green-400' : 'text-red-400'}`}>{asset.change}</p>
             </div>
           ))}
         </div>
@@ -250,7 +250,7 @@ export default function LandingPage() {
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
             <div>
               <h2 className="text-3xl font-bold mb-4">Your Money. Your Control.</h2>
-              <p className="text-gray-400 mb-6">We never hold your funds. Your crypto stays in your Coinbase account. We only execute trades through read/trade API access — no withdrawal permissions needed.</p>
+              <p className="text-gray-400 mb-6">We never hold your funds. Your assets stay in your own account (Coinbase or Alpaca). We only execute trades through read/trade API access — no withdrawal permissions needed.</p>
               <div className="space-y-3">
                 {[
                   'AES-256 encrypted API keys',
@@ -321,7 +321,7 @@ export default function LandingPage() {
             </a>
           </div>
           <p className="text-gray-600 text-xs mt-4 md:mt-0 text-center">
-            Cryptocurrency trading involves risk. Past performance does not guarantee future results.
+            Investment trading involves risk. Past performance does not guarantee future results.
           </p>
         </div>
       </footer>

@@ -1,7 +1,7 @@
 {
-  "name": "X Bot Trader",
-  "short_name": "X Bot",
-  "description": "AI Crypto Paper Trading Simulator - Master the crypto markets risk-free.",
+  "name": "X Bot Trader — AI Crypto & Stocks",
+  "short_name": "X Bot AI",
+  "description": "AI-powered trading bots for Crypto and Stocks. Trade 24/7 on your Coinbase & Alpaca accounts.",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#030712",
@@ -19,6 +19,19 @@
       "sizes": "512x512",
       "type": "image/png",
       "purpose": "any maskable"
+    }
+  ],
+  "screenshots": [],
+  "shortcuts": [
+    {
+      "name": "Dashboard",
+      "url": "/dashboard",
+      "description": "View your portfolio"
+    },
+    {
+      "name": "Markets",
+      "url": "/markets",
+      "description": "Live Crypto & Stock prices"
     }
   ]
 }

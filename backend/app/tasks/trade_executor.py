@@ -15,6 +15,10 @@ from sqlalchemy.orm import Session, sessionmaker
 from app.config import settings
 from app.models.strategy import Strategy
 from app.models.trade import Trade
+from app.models.exchange_key import ExchangeKey
+from app.services.coinbase_service import CoinbaseService
+from app.services.alpaca_service import AlpacaService
+from app.services.crypto_service import decrypt_value
 from app.tasks.celery_app import celery_app
 
 logger = logging.getLogger(__name__)
@@ -31,22 +35,37 @@ PAPER_FEE_RATE = Decimal("0.006")  # 0.6% simulated fee
 
 
 def _get_price_sync(product_id: str) -> float | None:
-    """Fetch current price from Coinbase (synchronous for Celery)."""
-    try:
-        with httpx.Client(timeout=10.0) as client:
-            resp = client.get(
-                f"https://api.coinbase.com/api/v3/brokerage/market/products/{product_id}"
-            )
-            if resp.status_code == 200:
-                return float(resp.json().get("price", 0))
-            # Fallback to v2
-            resp = client.get(
-                f"https://api.coinbase.com/v2/prices/{product_id}/spot"
-            )
-            if resp.status_code == 200:
-                return float(resp.json().get("data", {}).get("amount", 0))
-    except Exception as e:
-        logger.warning("Price fetch failed for %s: %s", product_id, e)
+    """Fetch current price (Coinbase for crypto, Alpaca for stocks)."""
+    # Detect asset type (Crypto has hyphens like BTC-USD)
+    is_crypto = "-" in product_id
+    
+    if is_crypto:
+        try:
+            with httpx.Client(timeout=10.0) as client:
+                resp = client.get(
+                    f"https://api.coinbase.com/api/v3/brokerage/market/products/{product_id}"
+                )
+                if resp.status_code == 200:
+                    return float(resp.json().get("price", 0))
+                # Fallback to v2
+                resp = client.get(
+                    f"https://api.coinbase.com/v2/prices/{product_id}/spot"
+                )
+                if resp.status_code == 200:
+                    return float(resp.json().get("data", {}).get("amount", 0))
+        except Exception as e:
+            logger.warning("Coinbase price fetch failed for %s: %s", product_id, e)
+    else:
+        # STOCK path (Alpaca)
+        try:
+            import asyncio
+            client = AlpacaService()
+            loop = asyncio.new_event_loop()
+            price = loop.run_until_complete(client.get_price(product_id))
+            loop.close()
+            return float(price) if price else None
+        except Exception as e:
+            logger.warning("Alpaca price fetch failed for %s: %s", product_id, e)
     return None
 
 
@@ -93,12 +112,14 @@ def _record_trade(
     total_value: Decimal,
     fee: Decimal,
     reason: str,
+    exchange: str = "coinbase",
+    is_paper: bool = True,
 ):
     trade = Trade(
         id=uuid.uuid4(),
         user_id=user_id,
         strategy_id=strategy_id,
-        exchange="coinbase",
+        exchange=exchange,
         product_id=product_id,
         side=side,
         order_type="market",
@@ -107,13 +128,55 @@ def _record_trade(
         price=price,
         total_value=total_value,
         fee=fee,
-        is_paper=True,
+        is_paper=is_paper,
         trigger_reason=reason,
         executed_at=datetime.now(timezone.utc),
         created_at=datetime.now(timezone.utc),
     )
     db.add(trade)
     return trade
+
+
+def _get_coinbase_client(db: Session, user_id: uuid.UUID) -> CoinbaseService | None:
+    """Helper to get an authenticated Coinbase client for a user."""
+    key = db.execute(
+        select(ExchangeKey).where(
+            ExchangeKey.user_id == user_id, 
+            ExchangeKey.exchange == "coinbase"
+        )
+    ).scalar_one_or_none()
+    
+    if not key:
+        return None
+        
+    try:
+        api_key = decrypt_value(key.api_key_encrypted, key.key_nonce, key.key_tag, str(user_id))
+        api_secret = decrypt_value(key.api_secret_encrypted, key.secret_nonce, key.secret_tag, str(user_id))
+        return CoinbaseService(api_key, api_secret)
+    except Exception as e:
+        logger.error("Failed to decrypt keys for user %s: %s", user_id, e)
+        return None
+
+
+def _get_alpaca_client(db: Session, user_id: uuid.UUID, paper: bool = True) -> AlpacaService | None:
+    """Helper to get an authenticated Alpaca client for a user."""
+    key = db.execute(
+        select(ExchangeKey).where(
+            ExchangeKey.user_id == user_id, 
+            ExchangeKey.exchange == "alpaca"
+        )
+    ).scalar_one_or_none()
+    
+    if not key:
+        return AlpacaService(paper=paper)
+        
+    try:
+        api_key = decrypt_value(key.api_key_encrypted, key.key_nonce, key.key_tag, str(user_id))
+        api_secret = decrypt_value(key.api_secret_encrypted, key.secret_nonce, key.secret_tag, str(user_id))
+        return AlpacaService(api_key, api_secret, paper=paper)
+    except Exception as e:
+        logger.error("Failed to decrypt Alpaca keys for user %s: %s", user_id, e)
+        return AlpacaService(paper=paper)
 
 
 @celery_app.task(name="execute_strategies")
@@ -164,21 +227,59 @@ def _execute_dca(db: Session, strategy: Strategy):
         return
     price_dec = Decimal(str(price))
 
-    # Check paper balance
-    balance = _get_paper_balance(db, strategy.user_id)
-    if balance < investment_amount:
-        logger.info("Insufficient paper balance for strategy %s", strategy.id)
-        return
+    # Check balance (Paper or Live)
+    if strategy.is_paper_mode:
+        balance = _get_paper_balance(db, strategy.user_id)
+        if balance < investment_amount:
+            logger.info("Insufficient paper balance for strategy %s", strategy.id)
+            return
+            
+        # Calculate simulated qty and fee
+        fee = investment_amount * PAPER_FEE_RATE
+        net_amount = investment_amount - fee
+        quantity = net_amount / price_dec
+    else:
+        # LIVE TRADING manifestation
+        is_crypto = "-" in strategy.product_id
+        
+        if is_crypto:
+            client = _get_coinbase_client(db, strategy.user_id)
+            if not client:
+                logger.error("No Coinbase client for live strategy %s", strategy.id)
+                return
 
-    # Calculate quantity and fee
-    fee = investment_amount * PAPER_FEE_RATE
-    net_amount = investment_amount - fee
-    quantity = net_amount / price_dec
+            import asyncio
+            loop = asyncio.new_event_loop()
+            # Place real market buy on Coinbase
+            resp = loop.run_until_complete(client.place_market_buy(strategy.product_id, str(investment_amount)))
+            loop.close()
+            
+            if not resp or "error" in resp: return
+                
+            quantity = Decimal(str(resp.get("amount", 0))) or (investment_amount / price_dec)
+            fee = Decimal(str(resp.get("fee", 0))) or (investment_amount * Decimal("0.006"))
+            price_dec = Decimal(str(resp.get("price", price)))
+        else:
+            # LIVE STOCK BUY (Alpaca)
+            client = _get_alpaca_client(db, strategy.user_id, paper=False)
+            import asyncio
+            loop = asyncio.new_event_loop()
+            # Note: Alpaca needs qty in shares. We calculate based on investment_amount.
+            qty_shares = int(investment_amount / price_dec)
+            if qty_shares <= 0: return
+            resp = loop.run_until_complete(client.place_market_order(strategy.product_id, str(qty_shares), "buy"))
+            loop.close()
+            if not resp or "error" in resp: return
+            quantity = Decimal(str(resp.get("qty", qty_shares)))
+            price_dec = Decimal(str(resp.get("filled_avg_price", price)))
+            fee = Decimal("0") # Alpaca often has zero commission
 
-    # Record the buy trade
+    # Record the trade (Paper or Live)
     _record_trade(
         db, strategy.user_id, strategy.id, strategy.product_id,
-        "buy", price_dec, quantity, investment_amount, fee, "dca_interval"
+        "buy", price_dec, quantity, investment_amount, fee, "dca_interval",
+        exchange="alpaca" if "-" not in strategy.product_id else "coinbase",
+        is_paper=strategy.is_paper_mode
     )
 
     # Update strategy totals
@@ -260,7 +361,9 @@ def _execute_grid(db: Session, strategy: Strategy):
             qty = net / price_dec
             _record_trade(
                 db, strategy.user_id, strategy.id, strategy.product_id,
-                "buy", price_dec, qty, investment_per_grid, fee, "grid_entry"
+                "buy", price_dec, qty, investment_per_grid, fee, "grid_entry",
+                exchange="alpaca" if "-" not in strategy.product_id else "coinbase",
+                is_paper=strategy.is_paper_mode
             )
             new_invested = strategy.total_invested + investment_per_grid
             db.execute(
@@ -274,37 +377,69 @@ def _execute_grid(db: Session, strategy: Strategy):
             )
     elif current_level < last_level:
         # Price dropped — buy
-        balance = _get_paper_balance(db, strategy.user_id)
-        if balance >= investment_per_grid:
+        if strategy.is_paper_mode:
+            balance = _get_paper_balance(db, strategy.user_id)
+            if balance < investment_per_grid:
+                return
             fee = investment_per_grid * PAPER_FEE_RATE
             net = investment_per_grid - fee
             qty = net / price_dec
-            _record_trade(
-                db, strategy.user_id, strategy.id, strategy.product_id,
-                "buy", price_dec, qty, investment_per_grid, fee, "grid_buy"
+        else:
+            # LIVE GRID BUY
+            client = _get_coinbase_client(db, strategy.user_id)
+            if not client: return
+            import asyncio
+            loop = asyncio.new_event_loop()
+            resp = loop.run_until_complete(client.place_market_buy(strategy.product_id, str(investment_per_grid)))
+            loop.close()
+            if not resp or "error" in resp: return
+            qty = Decimal(str(resp.get("amount", investment_per_grid / price_dec)))
+            fee = Decimal(str(resp.get("fee", investment_per_grid * Decimal("0.006"))))
+
+        _record_trade(
+            db, strategy.user_id, strategy.id, strategy.product_id,
+            "buy", price_dec, qty, investment_per_grid, fee, "grid_buy",
+            exchange="alpaca" if "-" not in strategy.product_id else "coinbase",
+            is_paper=strategy.is_paper_mode
+        )
+        new_invested = strategy.total_invested + investment_per_grid
+        total_qty = _get_total_holdings(db, strategy.user_id, strategy.id, strategy.product_id) + qty
+        current_value = total_qty * price_dec
+        db.execute(
+            update(Strategy).where(Strategy.id == strategy.id).values(
+                total_invested=new_invested,
+                total_value=current_value,
+                pnl=current_value - new_invested,
+                config={**config, "_last_grid_level": current_level},
+                updated_at=datetime.now(timezone.utc),
             )
-            new_invested = strategy.total_invested + investment_per_grid
-            total_qty = _get_total_holdings(db, strategy.user_id, strategy.id, strategy.product_id) + qty
-            current_value = total_qty * price_dec
-            db.execute(
-                update(Strategy).where(Strategy.id == strategy.id).values(
-                    total_invested=new_invested,
-                    total_value=current_value,
-                    pnl=current_value - new_invested,
-                    config={**config, "_last_grid_level": current_level},
-                    updated_at=datetime.now(timezone.utc),
-                )
-            )
+        )
     elif current_level > last_level:
         # Price went up — sell
         total_qty = _get_total_holdings(db, strategy.user_id, strategy.id, strategy.product_id)
         sell_qty = total_qty / num_grids  # Sell proportional
         if sell_qty > 0 and total_qty > 0:
             sell_value = sell_qty * price_dec
-            fee = sell_value * PAPER_FEE_RATE
+            if strategy.is_paper_mode:
+                fee = sell_value * PAPER_FEE_RATE
+            else:
+                # LIVE GRID SELL
+                client = _get_coinbase_client(db, strategy.user_id)
+                if not client: return
+                import asyncio
+                loop = asyncio.new_event_loop()
+                # Place real market sell on Coinbase
+                resp = loop.run_until_complete(client.place_market_sell(strategy.product_id, str(sell_qty)))
+                loop.close()
+                if not resp or "error" in resp: return
+                sell_value = Decimal(str(resp.get("amount", sell_qty * price_dec)))
+                fee = Decimal(str(resp.get("fee", sell_value * Decimal("0.006"))))
+
             _record_trade(
                 db, strategy.user_id, strategy.id, strategy.product_id,
-                "sell", price_dec, sell_qty, sell_value, fee, "grid_sell"
+                "sell", price_dec, sell_qty, sell_value, fee, "grid_sell",
+                exchange="alpaca" if "-" not in strategy.product_id else "coinbase",
+                is_paper=strategy.is_paper_mode
             )
             remaining_qty = total_qty - sell_qty
             current_value = remaining_qty * price_dec
@@ -348,10 +483,30 @@ def _sell_all_holdings(db: Session, strategy: Strategy, price: Decimal, reason: 
         return
 
     sell_value = total_qty * price
-    fee = sell_value * PAPER_FEE_RATE
+    if strategy.is_paper_mode:
+        fee = sell_value * PAPER_FEE_RATE
+    else:
+        # LIVE SELL ALL
+        client = _get_coinbase_client(db, strategy.user_id)
+        if client:
+            import asyncio
+            loop = asyncio.new_event_loop()
+            resp = loop.run_until_complete(client.place_market_sell(strategy.product_id, str(total_qty)))
+            loop.close()
+            if resp and "error" not in resp:
+                sell_value = Decimal(str(resp.get("amount", total_qty * price)))
+                fee = Decimal(str(resp.get("fee", sell_value * Decimal("0.006"))))
+            else:
+                logger.error("Live liquidation failed for strategy %s", strategy.id)
+                return
+        else:
+            return
+
     _record_trade(
         db, strategy.user_id, strategy.id, strategy.product_id,
-        "sell", price, total_qty, sell_value, fee, reason
+        "sell", price, total_qty, sell_value, fee, reason,
+        exchange="alpaca" if "-" not in strategy.product_id else "coinbase",
+        is_paper=strategy.is_paper_mode
     )
 
     db.execute(

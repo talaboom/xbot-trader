@@ -57,6 +57,13 @@ async def register(data: UserRegister, db: AsyncSession = Depends(get_db)):
         if referrer:
             referred_by_id = referrer.id
             referrer.referral_count = (referrer.referral_count or 0) + 1
+            
+            # Grant 1 week of 'trader' plan as a reward
+            now = datetime.now(timezone.utc)
+            base_date = referrer.subscription_expires_at if (referrer.subscription_expires_at and referrer.subscription_expires_at > now) else now
+            referrer.subscription_expires_at = base_date + timedelta(days=7)
+            referrer.subscription_tier = "trader"
+            referrer.subscription_status = "active"
 
     code = generate_verify_code()
     user = User(

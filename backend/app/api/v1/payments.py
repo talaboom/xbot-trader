@@ -1,5 +1,6 @@
 """Payment API — Stripe checkout, portal, and crypto payment submissions."""
 
+from datetime import datetime, timezone
 from fastapi import APIRouter, Depends, HTTPException
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -59,12 +60,23 @@ async def stripe_portal(
 @router.get("/status")
 async def get_payment_status(
     user: User = Depends(get_current_user),
+    db: AsyncSession = Depends(get_db),
 ):
-    """Get user's current subscription status."""
+    """Get user's current subscription status, accounting for expiration."""
+    now = datetime.now(timezone.utc)
+    is_active = user.subscription_status == "active"
+    
+    # Check for expiration
+    if is_active and user.subscription_expires_at and user.subscription_expires_at < now:
+        is_active = False
+        # Optionally update user in DB here if needed, or just return false
+        # For now, we return the real-time status
+    
     return {
-        "plan": user.subscription_tier,
-        "status": user.subscription_status,
-        "is_active": user.subscription_status == "active",
+        "plan": user.subscription_tier if is_active else "free",
+        "status": user.subscription_status if is_active else "inactive",
+        "is_active": is_active,
+        "expires_at": user.subscription_expires_at.isoformat() if user.subscription_expires_at else None,
     }
 
 

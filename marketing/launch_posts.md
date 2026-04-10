@@ -17,7 +17,9 @@ Pick a bot. It trades 24/7. Your money stays in YOUR account.
 ✅ Paper trading with $100K virtual money
 ✅ Copy top traders automatically
 ✅ Real-time market data
-✅ AI trading assistant
+✅ AI trading assistant (Gemini Powered)
+
+🎁 **GIVEAWAY**: Sign up and use your referral link to invite friends. Get **1 WEEK FREE** of our Trader plan for EVERY friend you bring! 🚀
 
 Start free. Go pro for $20/month.
 Money-back guarantee if the bot doesn't cover your subscription.
@@ -40,6 +42,8 @@ No coding. No experience needed. Start with fake money, go live when ready.
 
 Your funds stay in your own Coinbase account. We never touch your money.
 
+Bonus: Invite your friends and earn **1 week of FREE premium access** for every signup! 🤝
+
 www.xbottrader.ca
 
 #AITrading #CryptoTrading #TradingBot #Bitcoin #Ethereum #Solana #DCA #GridTrading #AutomatedTrading #CryptoForBeginners
@@ -57,6 +61,7 @@ Perfect for:
 → Testing bot strategies before going live
 → Competing on the leaderboard
 
+Plus, get a **FREE Trader plan upgrade** just by inviting your friends! (1 week per referral) 📈
 Sign up free at www.xbottrader.ca
 
 #PaperTrading #CryptoSimulator #BitcoinTrading #LearnCrypto #CryptoTrading #RiskFree #TradingPractice
@@ -77,6 +82,8 @@ AI crypto trading bots that run 24/7:
 Start with $100K paper trading (free)
 Go live for $20/month
 
+🎁 Refer a friend = **1 week of FREE premium access!**
+
 Your money stays in YOUR Coinbase account.
 
 www.xbottrader.ca
@@ -90,6 +97,7 @@ X Bot Trader's AI picks when to buy and sell. You just pick a strategy and set a
 
 Start with paper trading (virtual money, real prices).
 
+Get free premium access just by sharing your link with friends! 🤝
 www.xbottrader.ca
 
 ### Tweet 3: Thread Starter
@@ -105,6 +113,7 @@ Here's how I built an AI crypto trading platform in a week 🧵
 - Celery for background trading
 - PostgreSQL + Redis
 - Coinbase API for real market data
+- Gemini AI for strategy insights
 
 4/ The strategies:
 - DCA (Dollar Cost Averaging) - buy consistently
@@ -114,7 +123,7 @@ Here's how I built an AI crypto trading platform in a week 🧵
 
 5/ It's live now: www.xbottrader.ca
 Free paper trading with $100K virtual money.
-$20/month for live trading.
+Referral bonus: **1 week FREE per invite!** 🚀
 
 ---
 
@@ -128,6 +137,7 @@ $20/month for live trading.
 "Pick a bot. It trades 24/7."
 [Show leaderboard]
 "Compete against other traders."
+"And you can get the pro features for free just by inviting friends!"
 [Show landing page]
 "Start free at xbottrader.ca"
 
@@ -142,6 +152,7 @@ $20/month for live trading.
 5. Set it to buy $10 every 4 hours
 6. Start the bot
 "That's it. It trades automatically now."
+"Pro tip: Share your referral link to unlock live trading for free!"
 "You start with $100K fake money to practice."
 
 ---
@@ -160,11 +171,14 @@ I just launched X Bot Trader (www.xbottrader.ca) — an AI-powered crypto tradin
 - Paper trading with $100K virtual money using real Coinbase prices
 - 4 AI bot strategies: DCA, Grid Trading, Momentum, Mean Reversion
 - Strategy leaderboard — compete against other traders
-- AI trading assistant that explains trades
+- AI trading assistant that explains trades (Gemini 1.5 Powered)
 - Copy trading — mirror top performers
 
 **Why I built it:**
 I wanted a way to test trading strategies without risking real money. Most paper trading platforms are either too complex or don't have automated bots. So I built one.
+
+**Referral Reward:**
+I also added a referral system – for every friend you invite, you get **1 week for FREE** of the Trader plan (live trading).
 
 **Tech stack (for the nerds):**
 - React + TypeScript + Tailwind
@@ -173,9 +187,7 @@ I wanted a way to test trading strategies without risking real money. Most paper
 - Coinbase API for live prices
 - Hosted on Vercel + Railway
 
-It's free for paper trading. Paid plans ($20/mo) unlock live trading through Coinbase.
-
-Would love feedback! What features would you want to see?
+It's free for paper trading. Would love feedback! What features would you want to see?
 
 ---
 
@@ -188,10 +200,11 @@ The platform allows users to:
 → Practice trading with $100K in virtual funds
 → Deploy AI trading bots (DCA, Grid, Momentum strategies)
 → Compete on performance leaderboards
-→ Access real-time market data and AI analysis
+→ Access real-time market data and AI analysis powered by Gemini
 
 Built with a focus on education and risk management. Users can test strategies in a paper trading environment before committing real capital.
 
 Now live at www.xbottrader.ca
+Join our referral program to earn free premium access! 🤝
 
 #Fintech #AI #Cryptocurrency #Trading #Startup #Launch

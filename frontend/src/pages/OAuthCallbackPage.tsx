@@ -27,7 +27,7 @@ export default function OAuthCallbackPage() {
     const exchangeCode = async () => {
       try {
         const res = await client.post(`/auth/oauth/${provider}/callback?code=${encodeURIComponent(code)}`)
-        setTokens(res.data.access_token, res.data.refresh_token)
+        await setTokens(res.data.access_token, res.data.refresh_token)
         navigate('/dashboard')
       } catch (err: any) {
         setError(err.response?.data?.detail || 'Authentication failed. Please try again.')

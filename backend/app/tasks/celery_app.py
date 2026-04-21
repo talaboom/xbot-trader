@@ -15,7 +15,7 @@ celery_app.conf.update(
     enable_utc=True,
     beat_scheduler="redbeat.RedBeatScheduler",
     redbeat_redis_url=redis_url,
-    imports=["app.tasks.trade_executor"],
+    imports=["app.tasks.trade_executor", "app.tasks.backtest_executor"],
     beat_schedule={
         "execute-strategies-every-minute": {
             "task": "execute_strategies",

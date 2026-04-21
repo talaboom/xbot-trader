@@ -7,6 +7,7 @@ from app.database import get_db
 from app.models.strategy import Strategy
 from app.models.user import User
 from app.schemas.strategy import StrategyCreate, StrategyResponse
+from app.tasks.trade_executor import execute_strategies
 
 router = APIRouter(prefix="/strategies", tags=["strategies"])
 
@@ -81,6 +82,7 @@ async def start_strategy(
 
     strategy.status = "running"
     await db.commit()
+    execute_strategies.delay()
     return {"message": "Strategy started", "status": "running"}
 
 

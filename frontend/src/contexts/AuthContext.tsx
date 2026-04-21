@@ -13,7 +13,7 @@ interface User {
 interface AuthCtx {
   user: User | null
   loading: boolean
-  setTokens: (access: string, refresh: string) => void
+  setTokens: (access: string, refresh: string) => Promise<void>
   logout: () => void
   refreshUser: () => Promise<void>
 }
@@ -51,10 +51,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     fetchUser()
   }, [])
 
-  const setTokens = (access: string, refresh: string) => {
+  const setTokens = async (access: string, refresh: string) => {
     localStorage.setItem('access_token', access)
     localStorage.setItem('refresh_token', refresh)
-    fetchUser()
+    await fetchUser()
   }
 
   const logout = () => {

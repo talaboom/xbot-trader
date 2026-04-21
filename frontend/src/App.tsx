@@ -22,6 +22,8 @@ const TermsPage          = lazy(() => import('./pages/TermsPage'))
 const PrivacyPage        = lazy(() => import('./pages/PrivacyPage'))
 const RiskPage           = lazy(() => import('./pages/RiskPage'))
 const OAuthCallbackPage  = lazy(() => import('./pages/OAuthCallbackPage'))
+const BacktestPage       = lazy(() => import('./pages/BacktestPage'))
+const BacktestResultPage = lazy(() => import('./pages/BacktestResultPage'))
 
 function PageLoader() {
   return (
@@ -56,6 +58,8 @@ function App() {
                 <Route path="/leaderboard" element={<LeaderboardPage />} />
                 <Route path="/trades"      element={<TradeHistoryPage />} />
                 <Route path="/settings"    element={<SettingsPage />} />
+                <Route path="/backtest"    element={<BacktestPage />} />
+                <Route path="/backtest/:id" element={<BacktestResultPage />} />
               </Route>
             </Routes>
           </Suspense>

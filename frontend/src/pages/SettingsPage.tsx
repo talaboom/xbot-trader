@@ -107,26 +107,29 @@ export default function SettingsPage() {
                 : 'No active subscription'}
             </p>
           </div>
-          {user?.subscription_status === 'active' ? (
-            <button
-              onClick={async () => {
-                try {
-                  const res = await createPortalSession()
-                  window.location.href = res.data.portal_url
-                } catch {}
-              }}
-              className="px-4 py-2 rounded-xl border border-white/10 text-white text-sm hover:bg-white/5 transition"
-            >
-              Manage Subscription
-            </button>
-          ) : (
+          <div className="flex gap-2">
+            {user?.subscription_status === 'active' && (
+              <button
+                onClick={async () => {
+                  try {
+                    const res = await createPortalSession()
+                    window.location.href = res.data.portal_url
+                  } catch (e: any) {
+                    alert(e?.response?.data?.detail || 'Could not open billing portal. Contact support at ivan@sync-security.com')
+                  }
+                }}
+                className="px-4 py-2 rounded-xl border border-white/10 text-white text-sm hover:bg-white/5 transition"
+              >
+                Manage Subscription
+              </button>
+            )}
             <Link
               to="/pricing"
               className="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-cyan-500 text-white text-sm font-semibold shadow-lg shadow-blue-500/25"
             >
-              Upgrade
+              {user?.subscription_status === 'active' ? 'Change Plan' : 'Upgrade'}
             </Link>
-          )}
+          </div>
         </div>
       </div>
 

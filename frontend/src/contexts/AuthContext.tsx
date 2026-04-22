@@ -21,7 +21,7 @@ interface AuthCtx {
 const AuthContext = createContext<AuthCtx>({
   user: null,
   loading: true,
-  setTokens: () => {},
+  setTokens: async () => {},
   logout: () => {},
   refreshUser: async () => {},
 })

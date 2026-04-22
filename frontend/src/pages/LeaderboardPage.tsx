@@ -37,10 +37,11 @@ export default function LeaderboardPage() {
       .finally(() => setLoading(false))
   }, [selectedTf, riskFilter])
 
-  const formatPnl = (pnl: number) => {
-    const prefix = pnl >= 0 ? '+' : ''
-    if (Math.abs(pnl) >= 1000) return `${prefix}$${(pnl / 1000).toFixed(1)}K`
-    return `${prefix}$${pnl.toFixed(0)}`
+  const formatPnl = (pnl: number | null | undefined) => {
+    const n = pnl ?? 0
+    const prefix = n >= 0 ? '+' : ''
+    if (Math.abs(n) >= 1000) return `${prefix}$${(n / 1000).toFixed(1)}K`
+    return `${prefix}$${n.toFixed(0)}`
   }
 
   if (loading) {
@@ -170,8 +171,8 @@ export default function LeaderboardPage() {
                       </span>
                       <br /><span className="text-xs text-gray-500">{formatPnl(t.pnl)}</span>
                     </td>
-                    <td className="px-5 py-4 text-right text-white font-medium">{t.win_rate}%</td>
-                    <td className="px-5 py-4 text-right text-gray-300">{t.trade_count.toLocaleString()}</td>
+                    <td className="px-5 py-4 text-right text-white font-medium">{t.win_rate ?? 0}%</td>
+                    <td className="px-5 py-4 text-right text-gray-300">{(t.trade_count ?? 0).toLocaleString()}</td>
                     <td className="px-5 py-4 text-center">
                       <span className={`text-xs px-2 py-1 rounded-full font-medium ${
                         t.risk_level === 'Low' ? 'bg-green-500/20 text-green-400' :

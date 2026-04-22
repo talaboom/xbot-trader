@@ -1,13 +1,13 @@
 """Add OAuth fields to users table
 
-Revision ID: 004
-Revises: 003
+Revision ID: 004b
+Revises: 004
 """
 from alembic import op
 import sqlalchemy as sa
 
-revision = "004"
-down_revision = "003"
+revision = "004b"
+down_revision = "004"
 branch_labels = None
 depends_on = None
 

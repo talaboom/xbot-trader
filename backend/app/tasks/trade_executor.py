@@ -284,9 +284,8 @@ def _execute_dca(db: Session, strategy: Strategy):
 
     # Update strategy totals
     new_invested = strategy.total_invested + investment_amount
-    # Calculate total value of all holdings at current price
+    # autoflush ensures the just-recorded trade is included
     total_qty = _get_total_holdings(db, strategy.user_id, strategy.id, strategy.product_id, strategy.is_paper_mode)
-    total_qty += quantity
     current_value = total_qty * price_dec
     pnl = current_value - new_invested
 
@@ -299,6 +298,11 @@ def _execute_dca(db: Session, strategy: Strategy):
         )
     )
 
+    logger.info(
+        "DCA buy: strategy=%s, product=%s, qty=%s, price=%s, next_in=%sh",
+        strategy.id, strategy.product_id, quantity, price_dec, interval_hours,
+    )
+
     # Check stop-loss / take-profit
     if new_invested > 0:
         pnl_pct = (pnl / new_invested) * 100
@@ -306,11 +310,6 @@ def _execute_dca(db: Session, strategy: Strategy):
             _sell_all_holdings(db, strategy, price_dec, "stop_loss")
         elif pnl_pct >= take_profit_pct:
             _sell_all_holdings(db, strategy, price_dec, "take_profit")
-
-    logger.info(
-        "DCA buy: strategy=%s, product=%s, qty=%s, price=%s, next_in=%sh",
-        strategy.id, strategy.product_id, quantity, price_dec, interval_hours,
-    )
 
 
 def _execute_grid(db: Session, strategy: Strategy):

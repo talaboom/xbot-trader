@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { getLeaderboard } from '../api/dashboard'
+import { useToast } from '../components/Toast'
 
 const timeframes = [
   { label: '7 Days', value: '7d' },
@@ -28,6 +29,15 @@ export default function LeaderboardPage() {
   const [riskFilter, setRiskFilter] = useState('All')
   const [traders, setTraders] = useState<Trader[]>([])
   const [loading, setLoading] = useState(true)
+  const { toast } = useToast()
+
+  const handleCopy = (username: string) => {
+    toast({
+      type: 'info',
+      title: 'Copy trading — coming soon',
+      message: `We'll notify you when you can copy ${username}'s strategy.`,
+    })
+  }
 
   useEffect(() => {
     setLoading(true)
@@ -124,7 +134,7 @@ export default function LeaderboardPage() {
                       <p className="text-[10px] text-gray-500">Trades</p>
                     </div>
                   </div>
-                  <button className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 py-2.5 rounded-xl font-semibold text-sm shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition">
+                  <button onClick={() => handleCopy(t.username)} className="w-full bg-gradient-to-r from-blue-600 to-cyan-500 py-2.5 rounded-xl font-semibold text-sm shadow-lg shadow-blue-500/25 hover:shadow-blue-500/40 transition">
                     Copy Trader
                   </button>
                 </div>
@@ -181,7 +191,7 @@ export default function LeaderboardPage() {
                       }`}>{t.risk_level}</span>
                     </td>
                     <td className="px-5 py-4 text-center">
-                      <button className="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-4 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-500/20 transition opacity-0 group-hover:opacity-100">
+                      <button onClick={() => handleCopy(t.username)} className="bg-blue-500/10 border border-blue-500/30 text-blue-400 px-4 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-500/20 transition opacity-0 group-hover:opacity-100">
                         Copy
                       </button>
                     </td>

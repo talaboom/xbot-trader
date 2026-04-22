@@ -17,6 +17,9 @@ router = APIRouter(prefix="/ai", tags=["ai"])
 ANTHROPIC_API_KEY = os.getenv("ANTHROPIC_API_KEY", "")
 DEEPSEEK_API_KEY = os.getenv("DEEPSEEK_API_KEY", "")
 GEMINI_API_KEY = os.getenv("GEMINI_API_KEY", "")
+ANTIGRAVITY_API_KEY = os.getenv("ANTIGRAVITY_API_KEY", "")
+ANTIGRAVITY_BASE_URL = os.getenv("ANTIGRAVITY_BASE_URL", "").rstrip("/")
+ANTIGRAVITY_MODEL = os.getenv("ANTIGRAVITY_MODEL", "claude-sonnet-4.5")
 
 SYSTEM_PROMPT = """You are the X Bot Trader AI, a sophisticated trading mentor and strategist.
 Your sanctuary, X Bot Trader (located at xbottrader.ca), has evolved. We have expanded our mastery from the digital realm of cryptocurrency into the traditional world of Stocks.
@@ -83,6 +86,15 @@ async def chat(msg: ChatMessage, user: User = Depends(get_current_user)):
     try:
         message = msg.message
 
+        # Antigravity (OpenAI-compatible proxy) takes precedence when configured
+        if ANTIGRAVITY_API_KEY and ANTIGRAVITY_BASE_URL:
+            try:
+                result = await _antigravity_chat(message, user.username, msg.history)
+                if result:
+                    return result
+            except Exception as e:
+                logger.error(f"Antigravity error: {e}")
+
         # Try AI APIs — DeepSeek first, then Claude, then fallback
         if DEEPSEEK_API_KEY:
             try:
@@ -116,6 +128,60 @@ async def chat(msg: ChatMessage, user: User = Depends(get_current_user)):
             "response": f"Hey {user.username}! I can help you with trading strategies, market analysis, and crypto education. What would you like to know?",
             "suggestions": ["What strategy should I use?", "Explain DCA trading", "How does Grid trading work?", "Show current prices"]
         }
+
+
+async def _antigravity_chat(message: str, username: str, history: list | None = None) -> dict | None:
+    """Send message to an OpenAI-compatible Antigravity proxy/gateway."""
+    try:
+        btc = await get_public_price("BTC-USD")
+        eth = await get_public_price("ETH-USD")
+        sol = await get_public_price("SOL-USD")
+
+        price_context = ""
+        if btc:
+            price_context = f"\n\nCurrent prices: BTC=${btc:,.0f}, ETH=${eth:,.0f}, SOL=${sol:,.0f}"
+
+        messages = [{"role": "system", "content": SYSTEM_PROMPT + price_context}]
+        if history:
+            for h in history[-20:]:
+                messages.append({"role": h.role, "content": h.content})
+        messages.append({"role": "user", "content": f"User '{username}' says: {message}"})
+
+        async with httpx.AsyncClient(timeout=30.0) as client:
+            resp = await client.post(
+                f"{ANTIGRAVITY_BASE_URL}/chat/completions",
+                headers={
+                    "Authorization": f"Bearer {ANTIGRAVITY_API_KEY}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "model": ANTIGRAVITY_MODEL,
+                    "messages": messages,
+                    "max_tokens": 500,
+                    "temperature": 0.7,
+                },
+            )
+
+            if resp.status_code == 200:
+                data = resp.json()
+                text = data["choices"][0]["message"]["content"]
+
+                suggestions = ["What strategy should I use?", "Show current prices", "Analyze the market"]
+                if "SUGGESTIONS:" in text:
+                    parts = text.split("SUGGESTIONS:")
+                    text = parts[0].strip()
+                    try:
+                        import json
+                        suggestions = json.loads(parts[1].strip())
+                    except Exception:
+                        pass
+
+                return {"response": text, "suggestions": suggestions}
+            else:
+                logger.error(f"Antigravity API error {resp.status_code}: {resp.text[:200]}")
+    except Exception as e:
+        logger.error(f"Antigravity exception: {e}")
+    return None
 
 
 async def _deepseek_chat(message: str, username: str, history: list | None = None) -> dict | None:

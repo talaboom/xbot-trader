@@ -50,8 +50,8 @@ export default function PaymentPage() {
   const [txHash, setTxHash] = useState('')
   const [submitted, setSubmitted] = useState(false)
 
-  const plan = plans.find(p => p.id === selectedPlan)!
-  const wallet = cryptoWallets[selectedCrypto]
+  const plan = plans.find(p => p.id === selectedPlan) ?? plans[0]
+  const wallet = cryptoWallets[selectedCrypto] ?? cryptoWallets[0]
 
   const copyAddress = () => {
     navigator.clipboard.writeText(wallet.address)

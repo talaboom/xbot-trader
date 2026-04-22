@@ -70,7 +70,7 @@ export default function MarketPage() {
       {/* Heatmap grid */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-3">
         {livePrices.map((p: any) => {
-          const meta = cryptoMeta[p.symbol] || { icon: p.symbol[0], color: '#3b82f6', desc: '' }
+          const meta = cryptoMeta[p.symbol] || { icon: p.symbol?.[0] ?? '?', color: '#3b82f6', desc: '' }
           const change = p.change_24h ?? 0
           const isUp = change >= 0
           const intensity = Math.min(Math.abs(change) / 10, 1)

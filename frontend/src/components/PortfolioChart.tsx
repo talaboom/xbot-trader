@@ -12,6 +12,9 @@ export default function PortfolioChart({ height = 200 }: Props) {
   useEffect(() => {
     if (!chartRef.current) return
 
+    // Guard against late async callbacks touching a disposed chart.
+    let disposed = false
+
     const chart = createChart(chartRef.current, {
       width: chartRef.current.clientWidth,
       height,
@@ -37,13 +40,20 @@ export default function PortfolioChart({ height = 200 }: Props) {
       lineWidth: 2,
     })
 
+    const safeSetData = (data: { time: Time; value: number }[]) => {
+      if (disposed) return
+      try {
+        series.setData(data)
+        chart.timeScale().fitContent()
+      } catch {
+        // chart/series already disposed — ignore
+      }
+    }
+
     getPortfolioHistory()
       .then(res => {
         const data = res.data
-        if (data && data.length > 0) {
-          series.setData(data)
-          chart.timeScale().fitContent()
-        }
+        if (data && data.length > 0) safeSetData(data)
       })
       .catch(() => {
         // Fallback: animated demo data
@@ -54,15 +64,20 @@ export default function PortfolioChart({ height = 200 }: Props) {
           value += (Math.random() - 0.45) * 800
           data.push({ time: (now - i * 86400) as Time, value: Math.max(value, 95000) })
         }
-        series.setData(data)
-        chart.timeScale().fitContent()
+        safeSetData(data)
       })
 
     const handleResize = () => {
-      if (chartRef.current) chart.applyOptions({ width: chartRef.current.clientWidth })
+      if (!disposed && chartRef.current) {
+        try { chart.applyOptions({ width: chartRef.current.clientWidth }) } catch { /* disposed */ }
+      }
     }
     window.addEventListener('resize', handleResize)
-    return () => { window.removeEventListener('resize', handleResize); chart.remove() }
+    return () => {
+      disposed = true
+      window.removeEventListener('resize', handleResize)
+      try { chart.remove() } catch { /* already disposed */ }
+    }
   }, [height])
 
   return <div ref={chartRef} />

@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { getPrices, getMarketStats } from '../api/dashboard'
 import { usePriceStream } from '../hooks/usePriceStream'
 import PriceChart from '../components/PriceChart'
+import ErrorBoundary from '../components/ErrorBoundary'
 
 const cryptoMeta: Record<string, { icon: string; color: string; desc: string }> = {
   BTC: { icon: '₿', color: '#f7931a', desc: 'Digital Gold' },
@@ -105,7 +106,18 @@ export default function MarketPage() {
       </div>
 
       {/* Full chart */}
-      <PriceChart productId={selected} height={500} />
+      <ErrorBoundary
+        fallback={(_e, reset) => (
+          <div className="bg-[#0d0d20] border border-red-500/20 rounded-2xl p-6 text-center" style={{ height: 500 }}>
+            <p className="text-sm text-gray-400 mb-3">Chart hit an error.</p>
+            <button onClick={reset} className="bg-blue-500/20 border border-blue-500/40 text-blue-300 px-4 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-500/30 transition">
+              Reload chart
+            </button>
+          </div>
+        )}
+      >
+        <PriceChart productId={selected} height={500} />
+      </ErrorBoundary>
 
       {/* Market stats — real data from CoinGecko */}
       <div className="grid grid-cols-2 md:grid-cols-4 gap-4">

@@ -7,6 +7,7 @@ import PortfolioChart from '../components/PortfolioChart'
 import AssetAllocation from '../components/AssetAllocation'
 import MarketTicker from '../components/MarketTicker'
 import OnboardingWizard from '../components/OnboardingWizard'
+import ErrorBoundary from '../components/ErrorBoundary'
 
 export default function DashboardPage() {
   const [portfolio, setPortfolio] = useState<any>(null)
@@ -55,7 +56,11 @@ export default function DashboardPage() {
           </div>
           <p className="text-3xl font-bold text-white">${Number(portfolio?.total_value || 100000).toLocaleString()}</p>
           <p className="text-xs text-gray-500 mt-0.5">Virtual $100,000 — no real money</p>
-          <div className="mt-3 h-12"><PortfolioChart height={48} /></div>
+          <div className="mt-3 h-12">
+            <ErrorBoundary fallback={() => <div className="h-12" />}>
+              <PortfolioChart height={48} />
+            </ErrorBoundary>
+          </div>
         </div>
         <div className="bg-[#0d0d20] border border-white/5 rounded-2xl p-5">
           <p className="text-gray-400 text-sm mb-1">Total P&L</p>
@@ -82,7 +87,18 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Chart — takes 2 columns */}
         <div className="lg:col-span-2">
-          <PriceChart productId="BTC-USD" height={400} />
+          <ErrorBoundary
+            fallback={(_e, reset) => (
+              <div className="bg-[#0d0d20] border border-red-500/20 rounded-2xl p-6 text-center" style={{ height: 400 }}>
+                <p className="text-sm text-gray-400 mb-3">Chart hit an error.</p>
+                <button onClick={reset} className="bg-blue-500/20 border border-blue-500/40 text-blue-300 px-4 py-1.5 rounded-lg text-xs font-medium hover:bg-blue-500/30 transition">
+                  Reload chart
+                </button>
+              </div>
+            )}
+          >
+            <PriceChart productId="BTC-USD" height={400} />
+          </ErrorBoundary>
         </div>
 
         {/* Asset allocation */}

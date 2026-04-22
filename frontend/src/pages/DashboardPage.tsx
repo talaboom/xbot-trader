@@ -49,8 +49,12 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
         <div className="bg-gradient-to-br from-blue-600/20 to-cyan-600/10 border border-blue-500/20 rounded-2xl p-5 relative overflow-hidden">
           <div className="absolute -right-4 -top-4 w-24 h-24 rounded-full bg-blue-500/10 blur-2xl" />
-          <p className="text-gray-400 text-sm mb-1">Portfolio Value</p>
+          <div className="flex items-center gap-2 mb-1">
+            <p className="text-gray-400 text-sm">Portfolio Value</p>
+            <span className="text-xs bg-yellow-500/20 text-yellow-400 px-2 py-0.5 rounded-full font-medium">📝 Paper</span>
+          </div>
           <p className="text-3xl font-bold text-white">${Number(portfolio?.total_value || 100000).toLocaleString()}</p>
+          <p className="text-xs text-gray-500 mt-0.5">Virtual $100,000 — no real money</p>
           <div className="mt-3 h-12"><PortfolioChart height={48} /></div>
         </div>
         <div className="bg-[#0d0d20] border border-white/5 rounded-2xl p-5">

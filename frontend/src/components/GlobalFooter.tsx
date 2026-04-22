@@ -1,4 +1,5 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
 
 const sponsors = [
   { name: 'Sponsor 1', slot: true },
@@ -59,9 +60,9 @@ export default function GlobalFooter() {
               </svg>
             </a>
             <div className="flex gap-4 text-xs text-gray-500">
-              <a href="/privacy" className="hover:text-white transition-colors">Privacy</a>
-              <a href="/terms" className="hover:text-white transition-colors">Terms</a>
-              <a href="/contact" className="hover:text-white transition-colors">Contact</a>
+              <Link to="/privacy" className="hover:text-white transition-colors">Privacy</Link>
+              <Link to="/terms" className="hover:text-white transition-colors">Terms</Link>
+              <a href="mailto:ivan@sync-security.com" className="hover:text-white transition-colors">Contact</a>
             </div>
           </div>
         </div>

@@ -1,6 +1,7 @@
 import { Link, useLocation, Outlet } from 'react-router-dom'
 import { useAuth } from '../contexts/AuthContext'
 import AnimatedBackground from './AnimatedBackground'
+import ErrorBoundary from './ErrorBoundary'
 import GlobalFooter from './GlobalFooter'
 
 const variantMap: Record<string, 'default' | 'trading' | 'strategy' | 'history' | 'settings'> = {
@@ -14,6 +15,7 @@ const navItems = [
   { path: '/dashboard', label: 'Dashboard', icon: '📊' },
   { path: '/markets', label: 'Markets', icon: '💹' },
   { path: '/strategies', label: 'My Bots', icon: '🤖' },
+  { path: '/backtest', label: 'Backtest Lab', icon: '🧪' },
   { path: '/assistant', label: 'AI Assistant', icon: '🧠' },
   { path: '/leaderboard', label: 'Leaderboard', icon: '🏆' },
   { path: '/trades', label: 'Trade History', icon: '📈' },
@@ -92,7 +94,9 @@ export default function Layout() {
         <div className="flex-1 p-6 overflow-auto relative">
           <AnimatedBackground variant={variantMap[location.pathname] || 'default'} />
           <div className="relative" style={{ zIndex: 1 }}>
-            <Outlet />
+            <ErrorBoundary key={location.pathname}>
+              <Outlet />
+            </ErrorBoundary>
           </div>
         </div>
         <GlobalFooter />

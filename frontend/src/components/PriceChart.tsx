@@ -31,9 +31,8 @@ export default function PriceChart({ productId = 'BTC-USD', height = 420 }: Prop
   useEffect(() => {
     if (!chartRef.current) return
 
-    if (chartInstance.current) {
-      chartInstance.current.remove()
-    }
+    // Guard against late async callbacks touching a disposed chart.
+    let disposed = false
 
     const chart = createChart(chartRef.current, {
       width: chartRef.current.clientWidth,
@@ -63,11 +62,9 @@ export default function PriceChart({ productId = 'BTC-USD', height = 420 }: Prop
       },
       handleScroll: { vertTouchDrag: false },
     })
-
     chartInstance.current = chart
 
     let series: any
-
     if (chartType === 'candle') {
       series = chart.addCandlestickSeries({
         upColor: '#22c55e',
@@ -101,18 +98,14 @@ export default function PriceChart({ productId = 'BTC-USD', height = 420 }: Prop
         const granularity = tf.seconds
         const now = new Date()
         const start = new Date(now.getTime() - granularity * tf.count * 1000)
-
-        // Coinbase Exchange API — public, no auth required
-        // Returns: [[time, low, high, open, close, volume], ...]
         const resp = await fetch(
           `https://api.exchange.coinbase.com/products/${selectedProduct}/candles?granularity=${granularity}&start=${start.toISOString()}&end=${now.toISOString()}`
         )
-
+        if (disposed) return
         if (resp.ok) {
           const raw = await resp.json()
-          // Sort by time ascending (API returns newest first)
+          if (disposed) return
           const sorted = raw.sort((a: number[], b: number[]) => a[0] - b[0])
-
           const data: any[] = sorted.map((c: number[]) => {
             const [time, low, high, open, close] = c
             if (chartType === 'candle') {
@@ -121,24 +114,20 @@ export default function PriceChart({ productId = 'BTC-USD', height = 420 }: Prop
               return { time, value: close }
             }
           })
-
           if (data.length > 0) {
             series.setData(data)
             chart.timeScale().fitContent()
-
-            // Set current price and change
             const lastCandle = sorted[sorted.length - 1]
             const firstCandle = sorted[0]
-            setCurrentPrice(lastCandle[4]) // close
+            setCurrentPrice(lastCandle[4])
             if (firstCandle[4] > 0) {
               setPriceChange(((lastCandle[4] - firstCandle[4]) / firstCandle[4]) * 100)
             }
             return
           }
         }
-
-        // Fallback: fetch spot price if exchange API fails
         const spotResp = await fetch(`https://api.coinbase.com/v2/prices/${selectedProduct}/spot`)
+        if (disposed) return
         if (spotResp.ok) {
           const spotData = await spotResp.json()
           const price = parseFloat(spotData?.data?.amount || '0')
@@ -146,25 +135,30 @@ export default function PriceChart({ productId = 'BTC-USD', height = 420 }: Prop
           setPriceChange(0)
         }
       } catch (e) {
-        console.error('Chart data error:', e)
+        if (!disposed) console.error('Chart data error:', e)
       }
     }
 
     fetchData()
 
     const handleResize = () => {
-      if (chartRef.current) {
+      if (!disposed && chartRef.current) {
         chart.applyOptions({ width: chartRef.current.clientWidth })
       }
     }
     window.addEventListener('resize', handleResize)
-
     const interval = setInterval(fetchData, 30000)
 
     return () => {
+      disposed = true
       window.removeEventListener('resize', handleResize)
       clearInterval(interval)
-      chart.remove()
+      try {
+        chart.remove()
+      } catch {
+        // Chart already disposed — ignore.
+      }
+      chartInstance.current = null
     }
   }, [selectedProduct, selectedTf, chartType, height])
 
@@ -178,11 +172,13 @@ export default function PriceChart({ productId = 'BTC-USD', height = 420 }: Prop
     <div className="bg-[#0d0d20] border border-white/5 rounded-2xl overflow-hidden">
       <div className="px-5 py-4 border-b border-white/5 flex items-center justify-between flex-wrap gap-3">
         <div className="flex items-center gap-4">
-          <select value={selectedProduct} onChange={e => setSelectedProduct(e.target.value)}
-            className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm font-bold focus:outline-none focus:border-blue-500/50">
+          <select
+            value={selectedProduct}
+            onChange={e => setSelectedProduct(e.target.value)}
+            className="bg-white/5 border border-white/10 rounded-lg px-3 py-2 text-white text-sm font-bold focus:outline-none focus:border-blue-500/50"
+          >
             {products.map(p => <option key={p} value={p}>{p}</option>)}
           </select>
-
           {currentPrice && (
             <div>
               <span className="text-2xl font-bold text-white">{formatPrice(currentPrice)}</span>
@@ -192,28 +188,31 @@ export default function PriceChart({ productId = 'BTC-USD', height = 420 }: Prop
             </div>
           )}
         </div>
-
         <div className="flex items-center gap-2">
           <div className="flex bg-white/5 rounded-lg p-0.5">
             {(['candle', 'line', 'area'] as const).map(type => (
-              <button key={type} onClick={() => setChartType(type)}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${chartType === type ? 'bg-blue-500/20 text-blue-400' : 'text-gray-500 hover:text-white'}`}>
+              <button
+                key={type}
+                onClick={() => setChartType(type)}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${chartType === type ? 'bg-blue-500/20 text-blue-400' : 'text-gray-500 hover:text-white'}`}
+              >
                 {type === 'candle' ? 'Candle' : type === 'line' ? 'Line' : 'Area'}
               </button>
             ))}
           </div>
-
           <div className="flex bg-white/5 rounded-lg p-0.5">
             {timeframes.map(tf => (
-              <button key={tf.value} onClick={() => setSelectedTf(tf.value)}
-                className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${selectedTf === tf.value ? 'bg-blue-500/20 text-blue-400' : 'text-gray-500 hover:text-white'}`}>
+              <button
+                key={tf.value}
+                onClick={() => setSelectedTf(tf.value)}
+                className={`px-3 py-1.5 rounded-md text-xs font-medium transition ${selectedTf === tf.value ? 'bg-blue-500/20 text-blue-400' : 'text-gray-500 hover:text-white'}`}
+              >
                 {tf.label}
               </button>
             ))}
           </div>
         </div>
       </div>
-
       <div ref={chartRef} />
     </div>
   )

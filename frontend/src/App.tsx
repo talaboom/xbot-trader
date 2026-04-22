@@ -4,6 +4,7 @@ import { AuthProvider } from './contexts/AuthContext'
 import { ToastProvider } from './components/Toast'
 import ProtectedRoute from './components/ProtectedRoute'
 import Layout from './components/Layout'
+import ErrorBoundary from './components/ErrorBoundary'
 
 const LandingPage        = lazy(() => import('./pages/LandingPage'))
 const LoginPage          = lazy(() => import('./pages/LoginPage'))
@@ -22,6 +23,8 @@ const TermsPage          = lazy(() => import('./pages/TermsPage'))
 const PrivacyPage        = lazy(() => import('./pages/PrivacyPage'))
 const RiskPage           = lazy(() => import('./pages/RiskPage'))
 const OAuthCallbackPage  = lazy(() => import('./pages/OAuthCallbackPage'))
+const BacktestPage       = lazy(() => import('./pages/BacktestPage'))
+const BacktestResultPage = lazy(() => import('./pages/BacktestResultPage'))
 
 function PageLoader() {
   return (
@@ -33,35 +36,39 @@ function PageLoader() {
 
 function App() {
   return (
-    <AuthProvider>
-      <ToastProvider>
-        <BrowserRouter>
-          <Suspense fallback={<PageLoader />}>
-            <Routes>
-              <Route path="/"               element={<LandingPage />} />
-              <Route path="/login"          element={<LoginPage />} />
-              <Route path="/register"       element={<RegisterPage />} />
-              <Route path="/pricing"        element={<PricingPage />} />
-              <Route path="/payment"        element={<PaymentPage />} />
-              <Route path="/payment/success" element={<PaymentSuccessPage />} />
-              <Route path="/terms"          element={<TermsPage />} />
-              <Route path="/privacy"        element={<PrivacyPage />} />
-              <Route path="/risk"           element={<RiskPage />} />
-              <Route path="/auth/callback"  element={<OAuthCallbackPage />} />
-              <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
-                <Route path="/dashboard"   element={<DashboardPage />} />
-                <Route path="/markets"     element={<MarketPage />} />
-                <Route path="/strategies"  element={<StrategiesPage />} />
-                <Route path="/assistant"   element={<AIAssistantPage />} />
-                <Route path="/leaderboard" element={<LeaderboardPage />} />
-                <Route path="/trades"      element={<TradeHistoryPage />} />
-                <Route path="/settings"    element={<SettingsPage />} />
-              </Route>
-            </Routes>
-          </Suspense>
-        </BrowserRouter>
-      </ToastProvider>
-    </AuthProvider>
+    <ErrorBoundary>
+      <AuthProvider>
+        <ToastProvider>
+          <BrowserRouter>
+            <Suspense fallback={<PageLoader />}>
+              <Routes>
+                <Route path="/"               element={<LandingPage />} />
+                <Route path="/login"          element={<LoginPage />} />
+                <Route path="/register"       element={<RegisterPage />} />
+                <Route path="/pricing"        element={<PricingPage />} />
+                <Route path="/payment"        element={<PaymentPage />} />
+                <Route path="/payment/success" element={<PaymentSuccessPage />} />
+                <Route path="/terms"          element={<TermsPage />} />
+                <Route path="/privacy"        element={<PrivacyPage />} />
+                <Route path="/risk"           element={<RiskPage />} />
+                <Route path="/auth/callback"  element={<OAuthCallbackPage />} />
+                <Route element={<ProtectedRoute><Layout /></ProtectedRoute>}>
+                  <Route path="/dashboard"   element={<DashboardPage />} />
+                  <Route path="/markets"     element={<MarketPage />} />
+                  <Route path="/strategies"  element={<StrategiesPage />} />
+                  <Route path="/assistant"   element={<AIAssistantPage />} />
+                  <Route path="/leaderboard" element={<LeaderboardPage />} />
+                  <Route path="/trades"      element={<TradeHistoryPage />} />
+                  <Route path="/settings"    element={<SettingsPage />} />
+                  <Route path="/backtest"    element={<BacktestPage />} />
+                  <Route path="/backtest/:id" element={<BacktestResultPage />} />
+                </Route>
+              </Routes>
+            </Suspense>
+          </BrowserRouter>
+        </ToastProvider>
+      </AuthProvider>
+    </ErrorBoundary>
   )
 }
 

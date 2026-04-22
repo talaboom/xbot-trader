@@ -9,7 +9,7 @@ class Settings(BaseSettings):
     ENCRYPTION_MASTER_KEY: str
     ACCESS_TOKEN_EXPIRE_MINUTES: int = 30
     REFRESH_TOKEN_EXPIRE_DAYS: int = 7
-    ALLOWED_ORIGINS: str = "http://localhost:3000,https://www.xbottrader.ca,https://xbottrader.ca"
+    ALLOWED_ORIGINS: str = "http://localhost:3000,https://www.xbottrader.ca,https://xbottrader.ca,https://www.xbottrader.shop,https://xbottrader.shop"
     ANTHROPIC_API_KEY: str = ""
     GEMINI_API_KEY: str = ""
     ANTIGRAVITY_API_KEY: str = ""

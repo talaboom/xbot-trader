@@ -285,7 +285,7 @@ def _execute_dca(db: Session, strategy: Strategy):
     # Update strategy totals
     new_invested = strategy.total_invested + investment_amount
     # Calculate total value of all holdings at current price
-    total_qty = _get_total_holdings(db, strategy.user_id, strategy.id, strategy.product_id)
+    total_qty = _get_total_holdings(db, strategy.user_id, strategy.id, strategy.product_id, strategy.is_paper_mode)
     total_qty += quantity
     current_value = total_qty * price_dec
     pnl = current_value - new_invested
@@ -338,7 +338,7 @@ def _execute_grid(db: Session, strategy: Strategy):
     if price_dec < lower_price or price_dec > upper_price:
         # Check stop loss
         if strategy.total_invested > 0:
-            total_qty = _get_total_holdings(db, strategy.user_id, strategy.id, strategy.product_id)
+            total_qty = _get_total_holdings(db, strategy.user_id, strategy.id, strategy.product_id, strategy.is_paper_mode)
             current_value = total_qty * price_dec
             pnl_pct = ((current_value - strategy.total_invested) / strategy.total_invested) * 100
             if pnl_pct <= -stop_loss_pct:
@@ -403,7 +403,7 @@ def _execute_grid(db: Session, strategy: Strategy):
             is_paper=strategy.is_paper_mode
         )
         new_invested = strategy.total_invested + investment_per_grid
-        total_qty = _get_total_holdings(db, strategy.user_id, strategy.id, strategy.product_id) + qty
+        total_qty = _get_total_holdings(db, strategy.user_id, strategy.id, strategy.product_id, strategy.is_paper_mode) + qty
         current_value = total_qty * price_dec
         db.execute(
             update(Strategy).where(Strategy.id == strategy.id).values(
@@ -416,7 +416,7 @@ def _execute_grid(db: Session, strategy: Strategy):
         )
     elif current_level > last_level:
         # Price went up — sell
-        total_qty = _get_total_holdings(db, strategy.user_id, strategy.id, strategy.product_id)
+        total_qty = _get_total_holdings(db, strategy.user_id, strategy.id, strategy.product_id, strategy.is_paper_mode)
         sell_qty = total_qty / num_grids  # Sell proportional
         if sell_qty > 0 and total_qty > 0:
             sell_value = sell_qty * price_dec
@@ -454,7 +454,8 @@ def _execute_grid(db: Session, strategy: Strategy):
 
 
 def _get_total_holdings(
-    db: Session, user_id: uuid.UUID, strategy_id: uuid.UUID, product_id: str
+    db: Session, user_id: uuid.UUID, strategy_id: uuid.UUID, product_id: str,
+    is_paper: bool = True,
 ) -> Decimal:
     """Get net quantity held for a strategy (buys - sells)."""
     rows = db.execute(
@@ -462,7 +463,7 @@ def _get_total_holdings(
             Trade.user_id == user_id,
             Trade.strategy_id == strategy_id,
             Trade.product_id == product_id,
-            Trade.is_paper == True,  # noqa: E712
+            Trade.is_paper == is_paper,  # noqa: E712
             Trade.status == "filled",
         )
     ).all()
@@ -478,7 +479,7 @@ def _get_total_holdings(
 
 def _sell_all_holdings(db: Session, strategy: Strategy, price: Decimal, reason: str):
     """Liquidate all holdings for a strategy."""
-    total_qty = _get_total_holdings(db, strategy.user_id, strategy.id, strategy.product_id)
+    total_qty = _get_total_holdings(db, strategy.user_id, strategy.id, strategy.product_id, strategy.is_paper_mode)
     if total_qty <= 0:
         return
 
@@ -534,7 +535,7 @@ def update_strategy_values():
                 if not price:
                     continue
                 price_dec = Decimal(str(price))
-                total_qty = _get_total_holdings(db, strat.user_id, strat.id, strat.product_id)
+                total_qty = _get_total_holdings(db, strat.user_id, strat.id, strat.product_id, strat.is_paper_mode)
                 current_value = total_qty * price_dec
                 pnl = current_value - strat.total_invested
 

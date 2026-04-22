@@ -1,0 +1,215 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 800" width="800" height="800" role="img" aria-label="H200 NVL chip logo">
+  <title>H200 NVL — SyncSecurity</title>
+
+  <defs>
+    <!-- deep PCB fill -->
+    <radialGradient id="pcbGrad" cx="50%" cy="50%" r="70%">
+      <stop offset="0%"  stop-color="#0d3b1f"/>
+      <stop offset="55%" stop-color="#08261a"/>
+      <stop offset="100%" stop-color="#030d09"/>
+    </radialGradient>
+
+    <!-- glowing chip die -->
+    <linearGradient id="dieGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%"  stop-color="#1a1a1a"/>
+      <stop offset="100%" stop-color="#000000"/>
+    </linearGradient>
+
+    <!-- Nvidia-green bright -->
+    <linearGradient id="neonGreen" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%"  stop-color="#c3ff3a"/>
+      <stop offset="50%" stop-color="#76b900"/>
+      <stop offset="100%" stop-color="#3d7a00"/>
+    </linearGradient>
+
+    <!-- copper pad gradient -->
+    <linearGradient id="copperGrad" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#f6d98c"/>
+      <stop offset="100%" stop-color="#a87a2a"/>
+    </linearGradient>
+
+    <!-- outer glow filter -->
+    <filter id="neonGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+
+    <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="3" result="blur"/>
+      <feMerge>
+        <feMergeNode in="blur"/>
+        <feMergeNode in="SourceGraphic"/>
+      </feMerge>
+    </filter>
+  </defs>
+
+  <!-- PCB background -->
+  <rect x="0" y="0" width="800" height="800" rx="32" fill="url(#pcbGrad)"/>
+
+  <!-- subtle PCB trace grid -->
+  <g stroke="#0f5a2a" stroke-width="1" opacity="0.35" fill="none">
+    <path d="M 40 120 H 760"/>
+    <path d="M 40 200 H 300 L 330 230 H 760"/>
+    <path d="M 40 680 H 500 L 540 640 H 760"/>
+    <path d="M 40 600 H 760"/>
+    <path d="M 120 40 V 760"/>
+    <path d="M 680 40 V 760"/>
+    <path d="M 220 40 V 180 L 250 210"/>
+    <path d="M 580 40 V 180 L 550 210"/>
+    <path d="M 220 760 V 620 L 250 590"/>
+    <path d="M 580 760 V 620 L 550 590"/>
+  </g>
+
+  <!-- trace vias (small pads) -->
+  <g fill="#0f5a2a">
+    <circle cx="120" cy="120" r="4"/>
+    <circle cx="680" cy="120" r="4"/>
+    <circle cx="120" cy="680" r="4"/>
+    <circle cx="680" cy="680" r="4"/>
+    <circle cx="400" cy="60"  r="4"/>
+    <circle cx="400" cy="740" r="4"/>
+    <circle cx="60"  cy="400" r="4"/>
+    <circle cx="740" cy="400" r="4"/>
+  </g>
+
+  <!-- chip substrate (the green board around the die) -->
+  <rect x="170" y="170" width="460" height="460" rx="24"
+        fill="#0a3d1c" stroke="#76b900" stroke-width="2" opacity="0.95"/>
+
+  <!-- contact pads around the chip (BGA-style) -->
+  <g fill="url(#copperGrad)">
+    <!-- top row -->
+    <g>
+      <rect x="200" y="150" width="14" height="22" rx="2"/>
+      <rect x="240" y="150" width="14" height="22" rx="2"/>
+      <rect x="280" y="150" width="14" height="22" rx="2"/>
+      <rect x="320" y="150" width="14" height="22" rx="2"/>
+      <rect x="360" y="150" width="14" height="22" rx="2"/>
+      <rect x="400" y="150" width="14" height="22" rx="2"/>
+      <rect x="440" y="150" width="14" height="22" rx="2"/>
+      <rect x="480" y="150" width="14" height="22" rx="2"/>
+      <rect x="520" y="150" width="14" height="22" rx="2"/>
+      <rect x="560" y="150" width="14" height="22" rx="2"/>
+      <rect x="600" y="150" width="14" height="22" rx="2"/>
+    </g>
+    <!-- bottom row -->
+    <g>
+      <rect x="200" y="628" width="14" height="22" rx="2"/>
+      <rect x="240" y="628" width="14" height="22" rx="2"/>
+      <rect x="280" y="628" width="14" height="22" rx="2"/>
+      <rect x="320" y="628" width="14" height="22" rx="2"/>
+      <rect x="360" y="628" width="14" height="22" rx="2"/>
+      <rect x="400" y="628" width="14" height="22" rx="2"/>
+      <rect x="440" y="628" width="14" height="22" rx="2"/>
+      <rect x="480" y="628" width="14" height="22" rx="2"/>
+      <rect x="520" y="628" width="14" height="22" rx="2"/>
+      <rect x="560" y="628" width="14" height="22" rx="2"/>
+      <rect x="600" y="628" width="14" height="22" rx="2"/>
+    </g>
+    <!-- left col -->
+    <g>
+      <rect x="150" y="200" width="22" height="14" rx="2"/>
+      <rect x="150" y="240" width="22" height="14" rx="2"/>
+      <rect x="150" y="280" width="22" height="14" rx="2"/>
+      <rect x="150" y="320" width="22" height="14" rx="2"/>
+      <rect x="150" y="360" width="22" height="14" rx="2"/>
+      <rect x="150" y="400" width="22" height="14" rx="2"/>
+      <rect x="150" y="440" width="22" height="14" rx="2"/>
+      <rect x="150" y="480" width="22" height="14" rx="2"/>
+      <rect x="150" y="520" width="22" height="14" rx="2"/>
+      <rect x="150" y="560" width="22" height="14" rx="2"/>
+      <rect x="150" y="600" width="22" height="14" rx="2"/>
+    </g>
+    <!-- right col -->
+    <g>
+      <rect x="628" y="200" width="22" height="14" rx="2"/>
+      <rect x="628" y="240" width="22" height="14" rx="2"/>
+      <rect x="628" y="280" width="22" height="14" rx="2"/>
+      <rect x="628" y="320" width="22" height="14" rx="2"/>
+      <rect x="628" y="360" width="22" height="14" rx="2"/>
+      <rect x="628" y="400" width="22" height="14" rx="2"/>
+      <rect x="628" y="440" width="22" height="14" rx="2"/>
+      <rect x="628" y="480" width="22" height="14" rx="2"/>
+      <rect x="628" y="520" width="22" height="14" rx="2"/>
+      <rect x="628" y="560" width="22" height="14" rx="2"/>
+      <rect x="628" y="600" width="22" height="14" rx="2"/>
+    </g>
+  </g>
+
+  <!-- glowing chip die body -->
+  <rect x="220" y="220" width="360" height="360" rx="14"
+        fill="url(#dieGrad)"
+        stroke="url(#neonGreen)" stroke-width="3"
+        filter="url(#neonGlow)"/>
+
+  <!-- inner die etching lines -->
+  <g stroke="#76b900" stroke-width="1" fill="none" opacity="0.55">
+    <rect x="240" y="240" width="320" height="320" rx="8"/>
+    <rect x="258" y="258" width="284" height="284" rx="6"/>
+    <line x1="240" y1="400" x2="560" y2="400"/>
+    <line x1="400" y1="240" x2="400" y2="560"/>
+  </g>
+
+  <!-- corner die registration marks -->
+  <g fill="#76b900" filter="url(#softGlow)">
+    <rect x="236" y="236" width="10" height="10"/>
+    <rect x="554" y="236" width="10" height="10"/>
+    <rect x="236" y="554" width="10" height="10"/>
+    <rect x="554" y="554" width="10" height="10"/>
+  </g>
+
+  <!-- H200 main text -->
+  <g filter="url(#neonGlow)">
+    <text x="400" y="415"
+          text-anchor="middle"
+          font-family="'Courier New', 'Menlo', monospace"
+          font-size="140"
+          font-weight="900"
+          letter-spacing="6"
+          fill="url(#neonGreen)">H200</text>
+  </g>
+
+  <!-- NVL subtitle -->
+  <text x="400" y="480"
+        text-anchor="middle"
+        font-family="'Courier New', 'Menlo', monospace"
+        font-size="44"
+        font-weight="700"
+        letter-spacing="18"
+        fill="#c3ff3a"
+        opacity="0.95">N V L</text>
+
+  <!-- top label "NVIDIA" etched -->
+  <text x="400" y="280"
+        text-anchor="middle"
+        font-family="'Courier New', 'Menlo', monospace"
+        font-size="22"
+        font-weight="700"
+        letter-spacing="10"
+        fill="#76b900"
+        opacity="0.9">N V I D I A</text>
+
+  <!-- bottom spec line -->
+  <text x="400" y="540"
+        text-anchor="middle"
+        font-family="'Courier New', 'Menlo', monospace"
+        font-size="18"
+        font-weight="600"
+        letter-spacing="4"
+        fill="#76b900"
+        opacity="0.85">282 GB HBM3e</text>
+
+  <!-- footer brand -->
+  <text x="400" y="750"
+        text-anchor="middle"
+        font-family="'Helvetica Neue', Arial, sans-serif"
+        font-size="22"
+        font-weight="600"
+        letter-spacing="8"
+        fill="#76b900"
+        opacity="0.9">S Y N C S E C U R I T Y</text>
+</svg>

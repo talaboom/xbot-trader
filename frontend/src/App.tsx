@@ -25,6 +25,7 @@ const RiskPage           = lazy(() => import('./pages/RiskPage'))
 const OAuthCallbackPage  = lazy(() => import('./pages/OAuthCallbackPage'))
 const BacktestPage       = lazy(() => import('./pages/BacktestPage'))
 const BacktestResultPage = lazy(() => import('./pages/BacktestResultPage'))
+const SECRadarPage       = lazy(() => import('./pages/SECRadarPage'))
 
 function PageLoader() {
   return (
@@ -62,6 +63,7 @@ function App() {
                   <Route path="/settings"    element={<SettingsPage />} />
                   <Route path="/backtest"    element={<BacktestPage />} />
                   <Route path="/backtest/:id" element={<BacktestResultPage />} />
+                  <Route path="/sec-radar"   element={<SECRadarPage />} />
                 </Route>
               </Routes>
             </Suspense>

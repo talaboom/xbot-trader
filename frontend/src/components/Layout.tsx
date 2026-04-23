@@ -16,6 +16,7 @@ const navItems = [
   { path: '/markets', label: 'Markets', icon: '💹' },
   { path: '/strategies', label: 'My Bots', icon: '🤖' },
   { path: '/backtest', label: 'Backtest Lab', icon: '🧪' },
+  { path: '/sec-radar', label: 'SEC Radar', icon: '🛰️' },
   { path: '/assistant', label: 'AI Assistant', icon: '🧠' },
   { path: '/leaderboard', label: 'Leaderboard', icon: '🏆' },
   { path: '/trades', label: 'Trade History', icon: '📈' },

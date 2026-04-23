@@ -40,6 +40,10 @@ class Settings(BaseSettings):
     ALPACA_API_KEY: str = ""
     ALPACA_SECRET_KEY: str = ""
 
+    # SEC Radar (EDGAR requires a descriptive User-Agent with contact email per their fair-access policy)
+    SEC_USER_AGENT: str = "X Bot Trader (support@xbottrader.ca)"
+    SEC_RADAR_CLAUDE_MODEL: str = "claude-sonnet-4-6"
+
     class Config:
         env_file = ".env"
 

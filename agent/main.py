@@ -49,6 +49,12 @@ def load_config():
         ssh_key_path=os.getenv("SSH_KEY_PATH"),
         api_key=os.getenv("API_KEY"),
         heartbeat_interval=int(os.getenv("HEARTBEAT_INTERVAL", "30")),
+        enable_health_check=os.getenv("ENABLE_HEALTH_CHECK", "false").lower() == "true",
+        health_check_interval=int(os.getenv("HEALTH_CHECK_INTERVAL", "14400")),
+        health_check_url=os.getenv("HEALTH_CHECK_URL"),
+        health_check_command=os.getenv("HEALTH_CHECK_COMMAND"),
+        recovery_command=os.getenv("RECOVERY_COMMAND"),
+        alert_webhook=os.getenv("ALERT_WEBHOOK"),
     )
 
     return config

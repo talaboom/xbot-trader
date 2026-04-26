@@ -80,6 +80,50 @@ When you ask Claude on Windows to "fix ParrotOS":
 | `SSH_KEY_PATH` | None | Path to SSH private key |
 | `HEARTBEAT_INTERVAL` | `30` | Seconds between heartbeats |
 | `API_KEY` | Auto-generated | Set by agent on registration |
+| `ENABLE_HEALTH_CHECK` | `false` | Enable service health monitoring |
+| `HEALTH_CHECK_INTERVAL` | `14400` | Health check interval (seconds, default 4 hours) |
+| `HEALTH_CHECK_URL` | None | HTTP endpoint to check (e.g., http://localhost:8000/health) |
+| `HEALTH_CHECK_COMMAND` | None | Shell command to check status (e.g., systemctl is-active xbot-trader) |
+| `RECOVERY_COMMAND` | None | Command to run if service is down (e.g., systemctl restart xbot-trader) |
+| `ALERT_WEBHOOK` | None | Webhook URL to send alerts to when service status changes |
+
+## Health Monitoring
+
+The agent can automatically monitor a service and restart it if it crashes. This is useful for services like xbot-trader.
+
+### Setup Health Monitoring
+
+1. **Enable health checks** in `.env.agent`:
+```ini
+ENABLE_HEALTH_CHECK=true
+HEALTH_CHECK_INTERVAL=14400       # Check every 4 hours
+HEALTH_CHECK_URL=http://localhost:8000/health
+RECOVERY_COMMAND=systemctl restart xbot-trader
+ALERT_WEBHOOK=https://your-alerts.com/webhook
+```
+
+2. **Agent will**:
+   - Check service health every 4 hours
+   - If service is DOWN → Automatically restart it
+   - If restart succeeds → Log recovery, send alert
+   - If restart fails → Send alert "Service down, needs attention"
+
+3. **You only get notified when**:
+   - Service crashes and recovers (good news!)
+   - Service crashes and CAN'T be auto-restarted (needs you)
+
+### Example: Monitor xbot-trader.ca
+
+```ini
+ENABLE_HEALTH_CHECK=true
+HEALTH_CHECK_INTERVAL=14400
+HEALTH_CHECK_URL=http://localhost:8000/health
+HEALTH_CHECK_COMMAND=systemctl is-active xbot-trader
+RECOVERY_COMMAND=systemctl restart xbot-trader
+ALERT_WEBHOOK=https://your-discord-webhook.com/webhooks/xxx
+```
+
+The agent will check every 4 hours. If xbot-trader crashes, it automatically restarts and notifies you.
 
 ## Running as a Service (Linux/ParrotOS)
 

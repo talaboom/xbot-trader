@@ -26,6 +26,13 @@ class SystemConfig(BaseModel):
     ssh_key_path: Optional[str] = None
     api_key: Optional[str] = None
     heartbeat_interval: int = 30
+    # Health monitoring
+    enable_health_check: bool = False
+    health_check_interval: int = 14400  # 4 hours in seconds
+    health_check_url: Optional[str] = None  # e.g., http://localhost:8000/health
+    health_check_command: Optional[str] = None  # e.g., systemctl status xbot-trader
+    recovery_command: Optional[str] = None  # e.g., systemctl restart xbot-trader
+    alert_webhook: Optional[str] = None  # Webhook to send alerts to
 
 
 class SystemAgent:
@@ -234,6 +241,98 @@ class SystemAgent:
                 "stderr": str(e),
             }
 
+    async def check_health(self) -> Dict[str, Any]:
+        """Check health of configured service."""
+        if not self.config.enable_health_check:
+            return {"enabled": False}
+
+        health_status = {
+            "timestamp": datetime.utcnow().isoformat(),
+            "healthy": False,
+            "method": None,
+            "message": "",
+            "recovered": False,
+        }
+
+        # Try health check URL first
+        if self.config.health_check_url:
+            health_status["method"] = "http"
+            try:
+                async with self.session.get(
+                    self.config.health_check_url, timeout=aiohttp.ClientTimeout(total=5)
+                ) as resp:
+                    if resp.status == 200:
+                        health_status["healthy"] = True
+                        health_status["message"] = "Service responding normally"
+                        return health_status
+                    else:
+                        health_status["message"] = f"Unhealthy response: {resp.status}"
+            except Exception as e:
+                health_status["message"] = f"Health check failed: {str(e)}"
+
+        # Try health check command
+        if self.config.health_check_command and not health_status["healthy"]:
+            health_status["method"] = "command"
+            result = await self.execute_local_command(self.config.health_check_command)
+            health_status["healthy"] = result["success"]
+
+            if not health_status["healthy"]:
+                health_status["message"] = f"Service check failed: {result['stderr']}"
+                # Try recovery if service is down
+                if self.config.recovery_command:
+                    logger.warning(f"Service unhealthy, attempting recovery: {self.config.recovery_command}")
+                    recovery = await self.execute_local_command(self.config.recovery_command)
+                    if recovery["success"]:
+                        health_status["recovered"] = True
+                        health_status["message"] = "Service was down, recovered successfully"
+                        health_status["healthy"] = True
+                        await self._send_alert(f"Service recovered after crash", health_status)
+                    else:
+                        health_status["message"] = f"Recovery failed: {recovery['stderr']}"
+                        await self._send_alert(f"Service is down and recovery failed", health_status)
+            else:
+                health_status["message"] = "Service is running normally"
+
+        return health_status
+
+    async def _send_alert(self, message: str, details: Dict[str, Any]):
+        """Send alert about service status."""
+        logger.warning(f"ALERT: {message}")
+
+        if self.config.alert_webhook:
+            try:
+                payload = {
+                    "system": self.config.system_name,
+                    "message": message,
+                    "timestamp": datetime.utcnow().isoformat(),
+                    "details": details,
+                }
+                async with self.session.post(self.config.alert_webhook, json=payload) as resp:
+                    if resp.status in [200, 201]:
+                        logger.info("Alert sent successfully")
+                    else:
+                        logger.error(f"Alert webhook failed: {resp.status}")
+            except Exception as e:
+                logger.error(f"Failed to send alert: {e}")
+
+    async def periodic_health_check(self):
+        """Periodically check service health."""
+        if not self.config.enable_health_check:
+            return
+
+        interval = self.config.health_check_interval
+        logger.info(f"Health check enabled: every {interval} seconds ({interval/3600:.1f} hours)")
+
+        while self.running:
+            try:
+                logger.info(f"Running health check for {self.config.system_name}")
+                status = await self.check_health()
+                logger.info(f"Health check result: {status}")
+            except Exception as e:
+                logger.error(f"Health check error: {e}")
+
+            await asyncio.sleep(interval)
+
     async def run(self):
         """Start the system agent."""
         logger.info(f"Starting system agent for {self.config.system_name}")
@@ -244,10 +343,11 @@ class SystemAgent:
                 logger.error("Initialization failed")
                 return
 
-            # Run heartbeat and command listener concurrently
+            # Run heartbeat, command listener, and health checks concurrently
             await asyncio.gather(
                 self.send_heartbeat(),
                 self.listen_for_commands(),
+                self.periodic_health_check(),
             )
 
         except Exception as e:

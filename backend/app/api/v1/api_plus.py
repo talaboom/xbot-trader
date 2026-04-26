@@ -9,6 +9,8 @@ from app.schemas.system import (
     SystemListResponse,
     CommandDispatch,
     CommandResponse,
+    SSHCommand,
+    SSHCommandResponse,
 )
 from app.services.system_service import SystemService
 
@@ -142,3 +144,41 @@ async def deactivate_system(
 
     await db.commit()
     return {"message": "System deactivated", "system_id": str(system.id)}
+
+
+@router.post("/ssh/command", response_model=SSHCommandResponse)
+async def execute_ssh_command(
+    ssh_cmd: SSHCommand,
+    db: AsyncSession = Depends(get_db),
+):
+    """Execute a command on a remote system via SSH.
+
+    The source system (Claude) must have SSH access to the target system.
+    This endpoint routes the command to the source system's agent,
+    which will execute it and return the result.
+    """
+    source = await SystemService.get_system_by_id(db, ssh_cmd.source_system_id)
+    if not source:
+        raise HTTPException(status_code=404, detail="Source system not found")
+
+    target = await SystemService.get_system_by_id(db, ssh_cmd.target_system_id)
+    if not target:
+        raise HTTPException(status_code=404, detail="Target system not found")
+
+    if not target.ssh_enabled:
+        raise HTTPException(status_code=403, detail="Target system doesn't have SSH enabled")
+
+    if not target.ssh_user or not target.ip_address:
+        raise HTTPException(status_code=400, detail="Target system missing SSH configuration")
+
+    # TODO: Implement actual SSH command routing
+    # The source system's agent will use this to execute commands on target
+    # For now, return a placeholder response
+
+    return SSHCommandResponse(
+        success=True,
+        message=f"SSH command queued for execution on {target.name}",
+        stdout="",
+        stderr="",
+        exit_code=None,
+    )

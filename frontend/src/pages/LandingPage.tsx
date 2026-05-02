@@ -79,11 +79,7 @@ export default function LandingPage() {
       {/* Nav */}
       <nav className="relative z-10 flex items-center justify-between px-6 py-4 max-w-7xl mx-auto">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
-            <svg className="w-6 h-6 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-              <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-            </svg>
-          </div>
+          <img src="/icons/icon.svg" alt="X Bot Trader" className="w-10 h-10 rounded-xl" />
           <span className="text-xl font-bold">X Bot Trader</span>
         </div>
         <div className="flex items-center gap-4">
@@ -295,11 +291,7 @@ export default function LandingPage() {
       <footer className="relative z-10 border-t border-white/5 py-8 px-6">
         <div className="max-w-5xl mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-gray-500">
-            <div className="w-6 h-6 rounded bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center">
-              <svg className="w-4 h-4 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
-                <path strokeLinecap="round" strokeLinejoin="round" d="M13 7h8m0 0v8m0-8l-8 8-4-4-6 6" />
-              </svg>
-            </div>
+            <img src="/icons/icon.svg" alt="X Bot Trader" className="w-6 h-6 rounded" />
             X Bot Trader &copy; 2026
           </div>
           <div className="flex gap-6 text-gray-500 text-sm">

@@ -16,6 +16,7 @@ from app.config import settings
 from app.models.strategy import Strategy
 from app.models.trade import Trade
 from app.models.exchange_key import ExchangeKey
+from app.services.ai_signal_service import get_signal_sync
 from app.services.coinbase_service import CoinbaseService
 from app.services.alpaca_service import AlpacaService
 from app.services.crypto_service import decrypt_value
@@ -67,6 +68,33 @@ def _get_price_sync(product_id: str) -> float | None:
         except Exception as e:
             logger.warning("Alpaca price fetch failed for %s: %s", product_id, e)
     return None
+
+
+def _get_recent_closes_sync(product_id: str, limit: int = 24) -> list[float]:
+    """Fetch recent hourly closes for AI context. Empty list on any failure."""
+    is_crypto = "-" in product_id
+    if not is_crypto:
+        return []
+    try:
+        with httpx.Client(timeout=10.0) as client:
+            resp = client.get(
+                f"https://api.coinbase.com/api/v3/brokerage/market/products/{product_id}/candles",
+                params={"granularity": "ONE_HOUR", "limit": limit},
+            )
+            if resp.status_code != 200:
+                return []
+            candles = resp.json().get("candles", [])
+    except Exception as e:
+        logger.warning("Recent candles fetch failed for %s: %s", product_id, e)
+        return []
+    closes: list[float] = []
+    for c in candles:
+        try:
+            closes.append(float(c.get("close", 0)))
+        except (TypeError, ValueError):
+            continue
+    closes.reverse()  # oldest -> newest
+    return closes
 
 
 def _get_paper_balance(db: Session, user_id: uuid.UUID) -> Decimal:
@@ -226,6 +254,23 @@ def _execute_dca(db: Session, strategy: Strategy):
         logger.warning("No price for %s, skipping DCA", strategy.product_id)
         return
     price_dec = Decimal(str(price))
+
+    # Optional AI signal gate: only fires the buy when the local LLM says BUY
+    # with sufficient confidence. Falls back to normal DCA on any AI failure.
+    if config.get("use_ai_signal"):
+        min_conf = float(config.get("ai_min_confidence", 0.5))
+        recent = _get_recent_closes_sync(strategy.product_id)
+        signal = get_signal_sync(strategy.product_id, price, recent)
+        if signal.action != "BUY" or signal.confidence < min_conf:
+            logger.info(
+                "AI gate skipped DCA for strategy %s: action=%s conf=%.2f reason=%s",
+                strategy.id, signal.action, signal.confidence, signal.reason,
+            )
+            return
+        logger.info(
+            "AI gate approved DCA for strategy %s: conf=%.2f reason=%s",
+            strategy.id, signal.confidence, signal.reason,
+        )
 
     # Check balance (Paper or Live)
     if strategy.is_paper_mode:

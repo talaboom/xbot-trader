@@ -40,6 +40,11 @@ class Settings(BaseSettings):
     ALPACA_API_KEY: str = ""
     ALPACA_SECRET_KEY: str = ""
 
+    # Local / self-hosted AI signal generator (Ollama-compatible)
+    OLLAMA_BASE_URL: str = "http://localhost:11434"
+    OLLAMA_MODEL: str = "llama3.2:3b"
+    OLLAMA_TIMEOUT_SECONDS: float = 30.0
+
     class Config:
         env_file = ".env"
 

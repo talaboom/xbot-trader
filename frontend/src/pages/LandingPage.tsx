@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
+import BacktestWizard from '../components/BacktestWizard'
 
 const bots = [
   {
@@ -169,6 +170,9 @@ export default function LandingPage() {
           ))}
         </div>
       </section>
+
+      {/* Backtest wizard — Council Item #4 (frontend-only, no backend abuse vector) */}
+      <BacktestWizard />
 
       {/* Bots Section */}
       <section id="bots" className="relative z-10 max-w-7xl mx-auto px-6 mb-20">

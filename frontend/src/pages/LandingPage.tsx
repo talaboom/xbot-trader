@@ -211,6 +211,69 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* Telegram preview — Council Item #5: scroll-3 social proof + product touch */}
+      <section id="telegram" className="relative z-10 max-w-5xl mx-auto px-6 mb-20">
+        <div className="text-center mb-10">
+          <h2 className="text-3xl md:text-4xl font-bold mb-3">
+            <span className="bg-gradient-to-r from-cyan-400 to-blue-400 bg-clip-text text-transparent">
+              Your bot texts you when it trades
+            </span>
+          </h2>
+          <p className="text-gray-400 text-lg">Connect Telegram in 30 seconds. Every signal, every fill, every daily PnL.</p>
+        </div>
+
+        <div className="grid md:grid-cols-2 gap-8 items-center">
+          {/* Mock Telegram chat */}
+          <div className="backdrop-blur-lg bg-[#17212b] border border-white/5 rounded-2xl shadow-2xl shadow-cyan-500/10 overflow-hidden max-w-md mx-auto md:mx-0 w-full">
+            {/* Chat header */}
+            <div className="bg-[#1f2c38] px-4 py-3 flex items-center gap-3 border-b border-white/5">
+              <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-cyan-400 flex items-center justify-center font-bold text-white text-sm">XB</div>
+              <div className="flex-1">
+                <p className="text-white font-semibold text-sm">X Bot Trader</p>
+                <p className="text-gray-500 text-xs">last signal 2m ago</p>
+              </div>
+            </div>
+            {/* Messages */}
+            <div className="p-4 space-y-3 bg-[#0e1621] min-h-[280px]">
+              <div className="bg-[#182533] text-white text-sm rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%]">
+                <p className="text-cyan-400 font-semibold text-xs mb-1">SIGNAL · BTC/CAD</p>
+                <p>BUY @ $110,247 · qty 0.0091</p>
+                <p className="text-gray-500 text-xs mt-1">DCA · 04:00 UTC tick</p>
+              </div>
+              <div className="bg-[#182533] text-white text-sm rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%]">
+                <p className="text-green-400 font-semibold text-xs mb-1">FILL · BTC/CAD</p>
+                <p>Filled at $110,251 · fee $2.86</p>
+              </div>
+              <div className="bg-[#182533] text-white text-sm rounded-2xl rounded-tl-sm px-4 py-2.5 max-w-[85%]">
+                <p className="text-purple-400 font-semibold text-xs mb-1">DAILY · BTC/CAD</p>
+                <p>+$47.20 across 3 trades · win rate 67%</p>
+              </div>
+            </div>
+          </div>
+
+          {/* Right column: explanation + CTA */}
+          <div>
+            <ul className="space-y-4 text-gray-300 mb-8">
+              <li className="flex items-start gap-3">
+                <span className="text-cyan-400 mt-1 font-bold">→</span>
+                <span><strong className="text-white">Every signal</strong> — see what the bot decided and why</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-cyan-400 mt-1 font-bold">→</span>
+                <span><strong className="text-white">Every fill</strong> — exact price, fee, timestamp</span>
+              </li>
+              <li className="flex items-start gap-3">
+                <span className="text-cyan-400 mt-1 font-bold">→</span>
+                <span><strong className="text-white">Daily summary</strong> — PnL + win rate, no spreadsheet needed</span>
+              </li>
+            </ul>
+            <Link to="/register" className="inline-flex items-center gap-2 bg-gradient-to-r from-cyan-500 to-blue-500 hover:from-cyan-400 hover:to-blue-400 px-6 py-3.5 rounded-xl font-semibold text-white transition shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50">
+              Connect Telegram in 30 seconds →
+            </Link>
+          </div>
+        </div>
+      </section>
+
       {/* Top Traders / Advisors */}
       <section className="relative z-10 max-w-5xl mx-auto px-6 mb-20">
         <div className="text-center mb-12">

@@ -176,7 +176,7 @@ export default function LandingPage() {
           <h2 className="text-4xl font-bold mb-4">
             <span className="bg-gradient-to-r from-blue-400 to-cyan-400 bg-clip-text text-transparent">AI Trading Bots</span>
           </h2>
-          <p className="text-gray-400 text-lg">Pick a strategy. Each bot has been backtested and optimized.</p>
+          <p className="text-gray-400 text-lg">Pick a strategy. Backtest it on real history. Run it with virtual money. Go live when you trust it.</p>
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           {bots.map((bot) => (
@@ -193,22 +193,14 @@ export default function LandingPage() {
                 </div>
               </div>
               <p className="text-gray-400 mb-5">{bot.desc}</p>
-              <div className="grid grid-cols-3 gap-3">
-                <div className="bg-white/5 rounded-lg p-3 text-center">
-                  <p className="text-green-400 font-bold text-lg">{bot.stats.winRate}</p>
-                  <p className="text-gray-500 text-xs">Win Rate</p>
-                </div>
-                <div className="bg-white/5 rounded-lg p-3 text-center">
-                  <p className="text-blue-400 font-bold text-lg">{bot.stats.avgReturn}</p>
-                  <p className="text-gray-500 text-xs">Avg Return</p>
-                </div>
-                <div className="bg-white/5 rounded-lg p-3 text-center">
-                  <p className="text-purple-400 font-bold text-lg">{bot.stats.trades}</p>
-                  <p className="text-gray-500 text-xs">Trades</p>
-                </div>
+              {/* Honest trait pills — no fabricated performance numbers (Priya's trap warning) */}
+              <div className="flex flex-wrap gap-2">
+                <span className="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-300">Backtest before live</span>
+                <span className="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-300">Paper or live</span>
+                <span className="text-xs px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-gray-300">Configurable risk</span>
               </div>
               <Link to="/register" className={`mt-5 block text-center bg-gradient-to-r ${bot.gradient} px-6 py-3 rounded-xl font-semibold transition opacity-80 hover:opacity-100 shadow-lg ${bot.shadow}`}>
-                Start This Bot
+                Try with $10K paper money →
               </Link>
             </div>
           ))}

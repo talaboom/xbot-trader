@@ -91,28 +91,59 @@ export default function LandingPage() {
         </div>
       </nav>
 
-      {/* Hero */}
-      <section className="relative z-10 text-center px-6 pt-16 pb-20 max-w-5xl mx-auto">
-        <div className="inline-block mb-6 px-4 py-1.5 rounded-full bg-blue-500/10 border border-blue-500/20 text-blue-400 text-sm font-medium">
-          <span className="w-2 h-2 rounded-full bg-green-500 inline-block animate-pulse mr-2" />
-          Live Trading Active — 1,247 bots running now
+      {/* Hero — trust fingerprint + possessive endowment (Council redesign) */}
+      <section className="relative z-10 px-6 pt-12 pb-10 max-w-6xl mx-auto">
+        <div className="grid md:grid-cols-[auto_1fr] gap-8 items-center">
+          {/* Founder face — left. Replace src with real photo at /founder.jpg when available */}
+          <div className="flex flex-col items-center md:items-start gap-2 shrink-0">
+            <div className="w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden border-2 border-blue-500/40 shadow-xl shadow-blue-500/20 bg-gradient-to-br from-blue-600 to-purple-600 flex items-center justify-center text-4xl md:text-5xl font-bold">
+              IS
+            </div>
+            <div className="text-center md:text-left">
+              <p className="font-semibold text-white text-sm">Ivy Stavrikov</p>
+              <p className="text-xs text-gray-400">Founder · Toronto</p>
+            </div>
+          </div>
+
+          {/* Headline + CTA — right */}
+          <div>
+            <div className="inline-flex items-center gap-2 mb-4 px-3 py-1.5 rounded-full bg-green-500/10 border border-green-500/20 text-green-400 text-xs font-medium">
+              <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+              Your $10,000 paper account is ready
+            </div>
+            <h1 className="text-4xl md:text-6xl font-bold leading-tight mb-4">
+              <span className="bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">Trade with $10,000</span>
+              <br />
+              <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">before you risk a dollar.</span>
+            </h1>
+            <p className="text-lg text-gray-400 mb-6 max-w-xl">
+              Your funds stay at Coinbase. We never touch withdrawals. Run real DCA + Grid strategies on autopilot — practice with virtual money, go live when you trust it.
+            </p>
+            <div className="flex items-center gap-4 flex-wrap">
+              <Link to="/register" className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 px-8 py-4 rounded-xl font-bold text-lg transition shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50">
+                Claim my $10K account →
+              </Link>
+              <a href="#bots" className="px-6 py-4 rounded-xl font-semibold text-base border border-white/10 hover:bg-white/5 transition">
+                See the bots
+              </a>
+            </div>
+          </div>
         </div>
-        <h1 className="text-5xl md:text-7xl font-bold leading-tight mb-6">
-          <span className="bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent">Let AI Trade</span>
-          <br />
-          <span className="bg-gradient-to-r from-blue-400 via-cyan-400 to-purple-400 bg-clip-text text-transparent">Everything For You</span>
-        </h1>
-        <p className="text-xl text-gray-400 max-w-2xl mx-auto mb-10">
-          Pick a bot. Connect your exchange. Watch it trade 24/7.
-          Crypto & Stocks. Your money stays in your account — we just run the strategy.
-        </p>
-        <div className="flex items-center justify-center gap-4">
-          <Link to="/register" className="bg-gradient-to-r from-blue-600 to-cyan-500 hover:from-blue-500 hover:to-cyan-400 px-8 py-4 rounded-xl font-bold text-lg transition shadow-xl shadow-blue-500/30 hover:shadow-blue-500/50">
-            Start Trading — $20/mo
-          </Link>
-          <a href="#bots" className="px-8 py-4 rounded-xl font-semibold text-lg border border-white/10 hover:bg-white/5 transition">
-            View Bots
-          </a>
+
+        {/* Trust strip */}
+        <div className="mt-10 pt-6 border-t border-white/5 flex flex-wrap items-center justify-center gap-x-6 gap-y-3 text-sm text-gray-500">
+          <div className="flex items-center gap-2">
+            <span className="w-2 h-2 rounded-full bg-green-500 animate-pulse" />
+            <span>Funds custodied at <span className="text-white font-medium">Coinbase</span></span>
+          </div>
+          <span className="text-gray-700 hidden md:inline">·</span>
+          <div className="flex items-center gap-2">
+            <span>Read-only API keys — <span className="text-white font-medium">we never withdraw</span></span>
+          </div>
+          <span className="text-gray-700 hidden md:inline">·</span>
+          <div className="flex items-center gap-2">
+            <span>Built in <span className="text-white font-medium">Toronto, Canada</span></span>
+          </div>
         </div>
       </section>
 

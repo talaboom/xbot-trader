@@ -1,3 +1,4 @@
+import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 
 const bots = [
@@ -146,6 +147,9 @@ export default function LandingPage() {
           </div>
         </div>
       </section>
+
+      {/* Stats card — Council Item #3: cumulative endowment counter */}
+      <PublicStatsCard />
 
       {/* Live ticker */}
       <section className="relative z-10 max-w-5xl mx-auto px-6 mb-20">
@@ -423,3 +427,61 @@ export default function LandingPage() {
     </div>
   )
 }
+
+// PublicStatsCard — fetches /api/v1/public/stats, renders only if numbers are magnetic
+function PublicStatsCard() {
+  const [data, setData] = useState<{
+    total_pnl_30d_cad: number
+    active_strategies: number
+    trades_24h: number
+  } | null>(null)
+
+  useEffect(() => {
+    // Mirrors api/client.ts: VITE_API_URL or default to '/api/v1'
+    const apiBase = (import.meta as ImportMeta & { env: { VITE_API_URL?: string } }).env.VITE_API_URL || '/api/v1'
+    fetch(`${apiBase}/public/stats`)
+      .then((r) => (r.ok ? r.json() : null))
+      .then((j) => setData(j))
+      .catch(() => setData(null))
+  }, [])
+
+  if (!data) return null
+
+  const hasMagneticPnL = data.total_pnl_30d_cad >= 100
+  const hasActivity = data.active_strategies > 0 || data.trades_24h > 0
+  if (!hasMagneticPnL && !hasActivity) return null
+
+  return (
+    <section className="relative z-10 max-w-5xl mx-auto px-6 mb-10">
+      <div className="backdrop-blur-lg bg-gradient-to-br from-emerald-500/10 to-cyan-500/10 border border-emerald-500/20 rounded-2xl p-6 md:p-8 shadow-xl shadow-emerald-500/10">
+        <div className="flex flex-wrap items-center justify-around gap-6 text-center">
+          {hasMagneticPnL && (
+            <div>
+              <p className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-emerald-300 to-cyan-300 bg-clip-text text-transparent">
+                ${data.total_pnl_30d_cad.toLocaleString('en-CA', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+              </p>
+              <p className="text-xs uppercase tracking-wider text-gray-400 mt-1">generated for users · 30 days</p>
+            </div>
+          )}
+          {data.active_strategies > 0 && (
+            <div>
+              <p className="text-3xl md:text-4xl font-bold text-white">
+                {data.active_strategies.toLocaleString()}
+              </p>
+              <p className="text-xs uppercase tracking-wider text-gray-400 mt-1">live bots running</p>
+            </div>
+          )}
+          {data.trades_24h > 0 && (
+            <div>
+              <p className="text-3xl md:text-4xl font-bold text-white">
+                {data.trades_24h.toLocaleString()}
+              </p>
+              <p className="text-xs uppercase tracking-wider text-gray-400 mt-1">trades · last 24h</p>
+            </div>
+          )}
+        </div>
+      </div>
+    </section>
+  )
+}
+\n

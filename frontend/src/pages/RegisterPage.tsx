@@ -107,7 +107,9 @@ export default function RegisterPage() {
               X Bot Trader
             </h1>
           </div>
-          <p className="text-purple-400/80 text-lg">Start Trading with AI Today</p>
+          {/* Council redesign: possessive endowment framing */}
+          <p className="text-2xl font-semibold text-white mt-2">Your $10,000 paper account is ready</p>
+          <p className="text-purple-400/80 text-base mt-1">Claim it in two clicks. No card. Real strategies, virtual money.</p>
         </div>
 
         {refCode && (
@@ -119,7 +121,7 @@ export default function RegisterPage() {
         <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-2xl p-8 shadow-2xl shadow-purple-500/5">
           {step === 'register' ? (
             <>
-              <h2 className="text-xl font-semibold text-white mb-6">Create Account</h2>
+              <h2 className="text-xl font-semibold text-white mb-6">Claim Your Account</h2>
               {error && (
                 <div className="bg-red-500/10 border border-red-500/20 text-red-400 px-4 py-3 rounded-lg text-sm mb-5">
                   {error}
@@ -164,7 +166,7 @@ export default function RegisterPage() {
                 </label>
                 <button type="submit" disabled={loading}
                   className="w-full bg-gradient-to-r from-purple-600 to-pink-500 hover:from-purple-500 hover:to-pink-400 disabled:from-purple-800 disabled:to-pink-800 text-white font-semibold py-3.5 rounded-xl transition-all shadow-lg shadow-purple-500/25 hover:shadow-purple-500/40">
-                  {loading ? 'Creating account...' : 'Create Account'}
+                  {loading ? 'Claiming...' : 'Claim my $10K account →'}
                 </button>
               </form>
             </>
@@ -226,9 +228,9 @@ export default function RegisterPage() {
         {step === 'register' && (
           <div className="mt-8 space-y-3">
             {[
-              { icon: '🤖', text: 'AI strategies trade 24/7 while you sleep' },
-              { icon: '📊', text: 'Copy top traders with one click' },
-              { icon: '🔒', text: 'Your funds stay in your own Coinbase account' },
+              { icon: '💰', text: 'Funded with $10,000 virtual money — risk nothing' },
+              { icon: '🔒', text: 'Funds custodied at Coinbase. We never withdraw.' },
+              { icon: '⚡', text: 'Switch to live trading the day you trust the bot' },
             ].map((f, i) => (
               <div key={i} className="backdrop-blur-lg bg-white/5 border border-white/5 rounded-xl px-4 py-3 flex items-center gap-3">
                 <span className="text-xl">{f.icon}</span>

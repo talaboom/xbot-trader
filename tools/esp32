@@ -1,0 +1,103 @@
+#!/data/data/com.termux/files/usr/bin/bash
+# esp32 — Termux wrapper around esptool/pyserial for an OTG-attached ESP32.
+#
+# Usage:
+#   esp32 list                       List USB devices visible to termux-usb
+#   esp32 grant [DEV]                Request Android USB permission for DEV
+#   esp32 info                       Detect chip and print chip_id
+#   esp32 flash ADDR FILE [...]      Write flash (e.g. esp32 flash 0x1000 fw.bin)
+#   esp32 erase                      Erase entire flash
+#   esp32 monitor [BAUD]             Open serial monitor (default 115200)
+#   esp32 raw -- ARGS...             Pass ARGS straight to esptool.py
+#   esp32 device DEV                 Force a specific /dev/bus/usb/... path
+#                                    (or set ESP32_DEV in the environment)
+#
+# Requires Termux (F-Droid build) with: python esptool pyserial.
+
+set -eu
+
+PROG=${0##*/}
+
+die() { printf 'esp32: %s\n' "$*" >&2; exit 1; }
+
+need() {
+    command -v "$1" >/dev/null 2>&1 || die "missing '$1' — run: pkg install python && pip install esptool pyserial"
+}
+
+list_devs() {
+    need termux-usb
+    termux-usb -l
+}
+
+pick_dev() {
+    if [ -n "${ESP32_DEV:-}" ]; then
+        printf '%s\n' "$ESP32_DEV"
+        return
+    fi
+    need termux-usb
+    local devs
+    devs=$(termux-usb -l 2>/dev/null | sed '/^$/d')
+    local count
+    count=$(printf '%s\n' "$devs" | grep -c .)
+    case "$count" in
+        0) die "no USB devices found. Plug in the ESP32 via OTG and check the cable." ;;
+        1) printf '%s\n' "$devs" ;;
+        *)
+            printf 'multiple USB devices found:\n%s\n\nPick one with: %s device <path>  or  ESP32_DEV=<path> %s ...\n' \
+                "$devs" "$PROG" "$PROG" >&2
+            exit 1
+            ;;
+    esac
+}
+
+run_with_dev() {
+    local dev cmd
+    dev=$(pick_dev)
+    cmd=$1
+    need termux-usb
+    termux-usb -e "$cmd" "$dev"
+}
+
+cmd=${1:-}
+[ -n "$cmd" ] || { sed -n '2,20p' "$0"; exit 1; }
+shift || true
+
+case "$cmd" in
+    list)
+        list_devs
+        ;;
+    grant)
+        need termux-usb
+        dev=${1:-$(pick_dev)}
+        termux-usb -r "$dev"
+        ;;
+    device)
+        [ $# -eq 1 ] || die "usage: $PROG device /dev/bus/usb/XXX/YYY"
+        printf 'export ESP32_DEV=%s\n' "$1"
+        printf 'Run that in your shell to pin the device for this session.\n' >&2
+        ;;
+    info|chipid|chip_id)
+        run_with_dev "esptool.py --chip auto chip_id"
+        ;;
+    erase)
+        run_with_dev "esptool.py --chip auto erase_flash"
+        ;;
+    flash)
+        [ $# -ge 2 ] || die "usage: $PROG flash ADDR FILE [ADDR FILE ...]"
+        run_with_dev "esptool.py --chip auto write_flash $*"
+        ;;
+    monitor)
+        baud=${1:-115200}
+        run_with_dev "python -m serial.tools.miniterm - $baud"
+        ;;
+    raw)
+        [ $# -ge 1 ] || die "usage: $PROG raw <esptool args...>"
+        run_with_dev "esptool.py $*"
+        ;;
+    -h|--help|help)
+        sed -n '2,20p' "$0"
+        ;;
+    *)
+        die "unknown command '$cmd' (try: $PROG help)"
+        ;;
+esac

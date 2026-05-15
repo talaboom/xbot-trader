@@ -1,0 +1,9 @@
+{
+  "name": "autoflow",
+  "version": "0.1.0",
+  "description": "Auto-format edited files and run related tests after Edit/Write/MultiEdit tool calls.",
+  "author": {
+    "name": "xbot-trader"
+  },
+  "keywords": ["formatter", "tests", "hooks", "post-edit"]
+}

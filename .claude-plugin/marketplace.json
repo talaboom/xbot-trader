@@ -1,0 +1,13 @@
+{
+  "name": "xbot-trader-plugins",
+  "owner": {
+    "name": "xbot-trader"
+  },
+  "plugins": [
+    {
+      "name": "autoflow",
+      "source": "./plugins/autoflow",
+      "description": "Auto-format edited files and run related tests after Edit/Write/MultiEdit tool calls."
+    }
+  ]
+}
